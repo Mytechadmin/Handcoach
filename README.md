@@ -1,9 +1,6 @@
 # Handcoach
 Application Web de création d'entrainement de handball
 
-# HandCoach
-
-Application web de schématisation tactique pour le handball.
 
 HandCoach est né d’un besoin réel : étant entraineur et coach de handball depuis des années, pouvoir créer et organiser facilement des exercices et des séances d’entraînement, avec un support visuel clair et imprimable.
 
