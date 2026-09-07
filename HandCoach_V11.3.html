@@ -144,6 +144,9 @@ summary.tree-summary{
     cursor:grab;
     touch-action:none;
     user-select:none;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
 .sub-tree-item.session-sort-dragging {
     opacity: 0.4;
@@ -160,6 +163,17 @@ summary.tree-summary{
 .sub-tree-item.session-sort-dragging{opacity:.45;}
 .sub-tree-item.session-sort-before{border-top:3px solid #287fe8;}
 .sub-tree-item.session-sort-after{border-bottom:3px solid #287fe8;}
+.session-remove-btn{
+    border:0;
+    background:transparent;
+    color:#a33;
+    font-weight:bold;
+    cursor:pointer;
+    padding:2px 5px;
+    border-radius:3px;
+    flex:0 0 auto;
+}
+.session-remove-btn:hover{background:#fee2e2;}
 /* ZONE DE TRAVAIL PRINCIPALE */
 .main{
     flex:1;
@@ -473,6 +487,8 @@ summary.tree-summary{
     min-height:100px;
 }
 .drop-zone-area.drag-over{ background:#dbeafe; border-color:#1d4ed8; }
+.session-drop-target.drag-over{ background:#dbeafe; outline:2px dashed #1d4ed8; outline-offset:-2px; border-radius:6px; }
+.tree-group.drag-over > .tree-summary{ background:#dbeafe !important; outline:2px dashed #1d4ed8; outline-offset:-2px; border-radius:6px; }
 .session-row{
     display:flex;
     align-items:center;
@@ -558,6 +574,39 @@ summary.tree-summary{
     }
 }
 .print-header { display: none; }
+
+.session-exercise-picker{
+    max-height:180px;
+    overflow-y:auto;
+    border:1px solid #d7dde5;
+    border-radius:6px;
+    background:#f8fafc;
+    padding:5px;
+}
+.session-picker-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    padding:6px 8px;
+    background:#fff;
+    border-bottom:1px solid #e5e7eb;
+    font-size:12px;
+}
+.session-picker-item:last-child{border-bottom:none;}
+.session-add-btn{
+    flex:0 0 auto;
+    width:28px;
+    height:28px;
+    border:0;
+    border-radius:5px;
+    background:#287fe8;
+    color:#fff;
+    font-size:18px;
+    font-weight:bold;
+    cursor:pointer;
+}
+.session-add-btn:hover{opacity:.85;}
 </style>
 </head>
 <body>
@@ -712,10 +761,10 @@ summary.tree-summary{
 
             <section class="right-panel">
                 <div class="panel-tools">
-    <button id="undo" title="Annuler la dernière action">↶</button>
-    <button id="redo" title="Rétablir la dernière action">↷</button>
-    <button id="clearAll" title="Tout effacer sur les terrains">Tout vider</button>
-</div>
+                    <button id="undo" title="Annuler la dernière action">↶</button>
+                    <button id="redo" title="Rétablir la dernière action annulée">↷</button>
+                    <button id="clearAll" title="Tout effacer sur les terrains">Tout vider</button>
+                </div>
                 <div class="info-field">
                     <label>Mise en place</label>
                     <textarea id="setup" placeholder="Positionnement initial, matériel..."></textarea>
@@ -748,11 +797,8 @@ summary.tree-summary{
             <input id="sessionName" placeholder="Nom de la séance (ex: Séance Reprise)" style="flex:1; padding:8px; border:1px solid #ccc; border-radius:5px;">
             <input id="sessionCategory" placeholder="Thème (ex: Reprise)" style="width:150px; padding:8px; border:1px solid #ccc; border-radius:5px;">
         </div>
-        <div class="drop-zone-area" id="sessionDropZone">
-            <div id="sessionRows"></div>
-            <div id="emptyDropMsg" style="text-align:center; color:#94a3b8; padding:15px; font-style:italic;">
-                Dépose un exercice ici en le glissant depuis le menu de gauche
-            </div>
+        <div style="margin:14px 0; padding:10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; font-size:12px; color:#475569;">
+            La séance sera créée vide. Tu pourras ensuite ajouter les exercices un par un par <strong>glisser-déposer</strong> depuis la bibliothèque.
         </div>
         <div style="margin-top:15px; display:flex; gap:8px;">
             <button id="saveSessionBtn" style="background:#287fe8; color:white; border:none; padding:9px 15px; border-radius:5px; font-weight:bold;">Enregistrer la séance</button>
@@ -844,6 +890,7 @@ let pathsData = pathsByCourt[0];
 let undoStack = [];
 let redoStack = [];
 let sessionSortState = null;
+let draggedExerciseId = null;
 let sessionSuppressClickUntil = 0;
 
 /* Charge un tableau depuis localStorage, avec récupération des anciennes versions. */
@@ -1734,41 +1781,22 @@ function saveUndoPoint(){
 function restoreEditorSnapshot(snapshot){
     const data = JSON.parse(snapshot);
 
-    // Nettoie le terrain actuellement actif
     getObjectLayer().innerHTML = "";
-    getPencilLayer().innerHTML = "";
-
-    // Restaure les chemins des deux terrains
-    if(Array.isArray(data.pathsByCourt)){
-        pathsByCourt = data.pathsByCourt.map(paths => paths || []);
-    }else{
-        pathsByCourt = [
-            data.paths || []
-        ];
-    }
-
-    if(!pathsByCourt[activeCourtIndex]){
-        pathsByCourt[activeCourtIndex] = [];
-    }
-
+    const layer = getPencilLayer();
+    if(layer) layer.innerHTML = "";
+    pathsByCourt[activeCourtIndex] = [];
     pathsData = pathsByCourt[activeCourtIndex];
     selected = null;
 
-    // Restaure les objets du terrain actif
     (data.objects || []).forEach(object => {
-        createObject(
-            object.type,
-            object.left,
-            object.top,
-            object
-        );
+        createObject(object.type, object.left, object.top, object);
     });
 
-    // Restaure les traits du terrain actif
-    pathsData.forEach(pathData => {
+    (data.paths || []).forEach(pathData => {
         addSavedPath(pathData);
     });
 }
+
 /* Annuler. */
 function undo(){
     if(!undoStack.length) return;
@@ -2025,75 +2053,9 @@ $("importFile").onchange = event => {
    10. GESTION DES SÉANCES
 ========================================================= */
 
-const dropZone = $("sessionDropZone");
-
-dropZone.ondragover = event => {
-    event.preventDefault();
-    dropZone.classList.add("drag-over");
-};
-
-dropZone.ondragleave = () => {
-    dropZone.classList.remove("drag-over");
-};
-
-dropZone.ondrop = event => {
-    event.preventDefault();
-    dropZone.classList.remove("drag-over");
-
-    const exerciseId = event.dataTransfer.getData("text/plain");
-    if(exerciseId) addExerciseToSessionModal(exerciseId);
-};
-
-/* Ajoute un exercice dans la séance en cours. */
-function addExerciseToSessionModal(exerciseId, defaultDuration = 15){
-    const exercise = exercises.find(ex => ex.id === exerciseId);
-    if(!exercise) return;
-
-    $("emptyDropMsg").style.display = "none";
-
-    const row = document.createElement("div");
-    row.className = "session-row";
-    row.dataset.exId = exercise.id;
-
-    /* Le petit symbole ⋮⋮ sert de poignée visuelle de déplacement. */
-    row.innerHTML = `
-        <span class="session-drag-handle" title="Déplacer l'exercice">⋮⋮</span>
-
-        <span class="sess-name">
-            ${exercise.title}
-            <small style="color:#64748b">(${exercise.category})</small>
-        </span>
-
-        <input type="number"
-               class="sess-dur"
-               value="${exercise.duration || defaultDuration}"
-               min="1"> min
-
-        <button class="remove-session-exercise"
-                title="Retirer">✕</button>
-    `;
-
-    row.querySelector(".remove-session-exercise").onclick = () => {
-        row.remove();
-        checkEmptySession();
-    };
-
-    $("sessionRows").appendChild(row);
-}
-
-function checkEmptySession(){
-    if($("sessionRows").children.length === 0){
-        $("emptyDropMsg").style.display = "block";
-    }else{
-        $("emptyDropMsg").style.display = "none";
-    }
-}
-
 $("sessionButton").onclick = () => {
     $("sessionName").value = "";
     $("sessionCategory").value = "";
-    $("sessionRows").innerHTML = "";
-    checkEmptySession();
     $("sessionModal").classList.add("visible");
 };
 
@@ -2105,19 +2067,12 @@ $("saveSessionBtn").onclick = async () => {
     const name = $("sessionName").value.trim() || "Nouvelle Séance";
     const category = $("sessionCategory").value.trim() || "Général";
 
-    const rows = document.querySelectorAll("#sessionRows .session-row");
-
-    const items = Array.from(rows).map(row => ({
-        exerciseId: row.dataset.exId,
-        duration: row.querySelector(".sess-dur").value || "15"
-    }));
-
     sessions.push({
         id: uid(),
         name,
         category,
         date: new Date().toLocaleDateString("fr-FR"),
-        items
+        items: []
     });
 
     saveStorage();
@@ -2280,12 +2235,17 @@ function renderSidebar(){
         if(title) openStates.exercises[title] = details.open;
     });
 
-    // Séances ouvertes
-    document.querySelectorAll("#sessionsTree details.tree-group").forEach(details => {
-        const summary = details.querySelector(":scope > summary");
-        if(!summary) return;
-        const name = summary.querySelector("span")?.textContent?.trim() || summary.textContent.trim();
-        openStates.sessions[name] = details.open;
+    // Séances ouvertes : on mémorise les IDs, pas les noms.
+    document.querySelectorAll("#sessionsTree > details.tree-group").forEach(details => {
+        if(details.dataset.category) {
+            openStates.sessions[`category:${details.dataset.category}`] = details.open;
+        }
+    });
+
+    document.querySelectorAll("#sessionsTree details.session-library-group").forEach(details => {
+        if(details.dataset.sessionId) {
+            openStates.sessions[`session:${details.dataset.sessionId}`] = details.open;
+        }
     });
 
     // === Rendu normal ===
@@ -2325,7 +2285,13 @@ function renderSidebar(){
             `;
 
             item.ondragstart = event => {
+                draggedExerciseId = exercise.id;
+                event.dataTransfer.effectAllowed = "copy";
                 event.dataTransfer.setData("text/plain", exercise.id);
+            };
+
+            item.ondragend = () => {
+                draggedExerciseId = null;
             };
 
             const deleteButton = document.createElement("button");
@@ -2369,7 +2335,8 @@ function renderSidebar(){
 
         const details = document.createElement("details");
         details.className = "tree-group";
-        details.open = savedOpenStates[category] === true;
+        details.dataset.category = category;
+        details.open = savedOpenStates[`category:${category}`] === true;
 
         const summary = document.createElement("summary");
         summary.className = "tree-summary";
@@ -2381,14 +2348,12 @@ function renderSidebar(){
 
         categorySessions.forEach(session => {
             const sessionDetails = document.createElement("details");
-            sessionDetails.className = "tree-group";
+            sessionDetails.className = "tree-group session-library-group";
+            sessionDetails.dataset.sessionId = session.id;
             sessionDetails.style.margin = "4px 0";
 
-            // On garde la séance ouverte si elle l'était
-            const sessionKey = `📋 ${session.name}`;
-            sessionDetails.open = savedOpenStates[sessionKey] === true || 
-                                  savedOpenStates[session.name] === true; 
-     // par défaut on peut laisser ouvert si tu préfères
+            // On garde exactement l'état ouvert/fermé de cette séance.
+            sessionDetails.open = savedOpenStates[`session:${session.id}`] === true;
 
             const sessionSummary = document.createElement("summary");
             sessionSummary.className = "tree-summary";
@@ -2433,7 +2398,76 @@ function renderSidebar(){
             sessionDetails.appendChild(sessionSummary);
 
             const sessionContent = document.createElement("div");
-            sessionContent.className = "tree-content";
+            sessionContent.className = "tree-content session-drop-target";
+
+            /* =====================================================
+               AJOUT D'UN EXERCICE DANS UNE SÉANCE
+               Le dépôt est volontairement attaché à TOUTE la séance
+               (nom + contenu), et pas seulement à la zone intérieure.
+               Ainsi ça fonctionne même si la séance est fermée.
+            ===================================================== */
+            const dropExerciseIntoSession = event => {
+                event.preventDefault();
+                event.stopPropagation();
+
+                const exerciseId = (
+                    event.dataTransfer ? event.dataTransfer.getData("text/plain") : ""
+                ) || draggedExerciseId || "";
+
+                if(!exerciseId) return;
+
+                const exercise = exercises.find(ex => ex.id === exerciseId);
+                if(!exercise) return;
+
+                if(!Array.isArray(session.items)) session.items = [];
+
+                session.items.push({
+                    exerciseId: exercise.id,
+                    duration: exercise.duration || "15"
+                });
+
+                saveStorage();
+
+                if(handCoachDirectory){
+                    saveFilesToFolder().catch(error =>
+                        console.error("Erreur de synchronisation de la séance :", error)
+                    );
+                }
+            };
+
+            const startSessionDrop = event => {
+                event.preventDefault();
+                if(event.dataTransfer){
+                    event.dataTransfer.dropEffect = "copy";
+                }
+                sessionDetails.classList.add("drag-over");
+            };
+
+            const leaveSessionDrop = event => {
+                if(!sessionDetails.contains(event.relatedTarget)){
+                    sessionDetails.classList.remove("drag-over");
+                }
+            };
+
+            /* Toute la séance accepte un exercice déposé. */
+            sessionDetails.addEventListener("dragenter", startSessionDrop);
+            sessionDetails.addEventListener("dragover", startSessionDrop);
+            sessionDetails.addEventListener("dragleave", leaveSessionDrop);
+            sessionDetails.addEventListener("drop", event => {
+                sessionDetails.classList.remove("drag-over");
+                dropExerciseIntoSession(event);
+            });
+
+            /* La zone intérieure garde aussi son indication visuelle. */
+            sessionContent.addEventListener("dragover", startSessionDrop);
+            sessionContent.addEventListener("dragleave", leaveSessionDrop);
+
+            /* Empêche le clic sur le résumé de simplement ouvrir/fermer
+               au moment où le navigateur termine un glisser-déposer. */
+            sessionSummary.addEventListener("drop", event => {
+                sessionDetails.classList.remove("drag-over");
+                dropExerciseIntoSession(event);
+            });
 
             (session.items || []).forEach((item, itemIndex) => {
                 const exercise = exercises.find(ex => ex.id === item.exerciseId);
@@ -2450,7 +2484,29 @@ function renderSidebar(){
                     <span>↕ &nbsp;📄 ${exercise.title}
                         <small>(${item.duration} min)</small>
                     </span>
+                    <button class="session-remove-btn" title="Retirer cet exercice de la séance">✕</button>
                 `;
+
+                const removeFromSessionButton = subItem.querySelector(".session-remove-btn");
+                removeFromSessionButton.addEventListener("pointerdown", event => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                });
+
+                removeFromSessionButton.onclick = event => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if(!Array.isArray(session.items)) return;
+
+                    session.items.splice(itemIndex, 1);
+                    saveStorage();
+
+                    if(handCoachDirectory){
+                        saveFilesToFolder().catch(error =>
+                            console.error("Erreur de synchronisation de la séance :", error)
+                        );
+                    }
+                };
 
                 // === Drag & drop (le code que tu avais déjà) ===
                 subItem.addEventListener("pointerdown", event => {
