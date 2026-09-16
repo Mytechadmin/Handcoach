@@ -1,65 +1,87 @@
-# Handcoach
-Application Web de création d'entrainement de handball
+# HandCoach
 
+Application web de création d’entraînements de handball.
 
-HandCoach est né d’un besoin réel : étant entraineur et coach de handball depuis des années, pouvoir créer et organiser facilement des exercices et des séances d’entraînement, avec un support visuel clair et imprimable.
+HandCoach est né d’un besoin réel : en tant qu’entraîneur de handball, pouvoir créer et organiser facilement des exercices et des séances, avec un support visuel clair, imprimable, et accessible sur ordinateur comme sur téléphone.
 
 ## Présentation
 
-Ce projet est une application web monopage permettant de :
+Application web permettant de :
+
 - Schématiser des exercices sur un terrain de handball
 - Ajouter joueurs, plots, ballons, formes et annotations
-- Dessiner des trajectoires / consignes tactiques
+- Dessiner des trajectoires et consignes tactiques
 - Classer les exercices par catégories
 - Construire des séances à partir des exercices
-- Sauvegarder localement, exporter/importer en JSON et imprimer en pdf afin de partager sur le cloud
+- Sauvegarder et synchroniser les données (local + cloud)
+- Imprimer / exporter pour utilisation sur le terrain
 
-## Contexte
+**Démo :** [https://mytechadmin.github.io/handball-mobile/](https://mytechadmin.github.io/handball-mobile/)
 
-Je n’ai que des notions en développement.  
-Ce projet a été conçu et coder avec l’aide d’une IA, à partir d’un besoin concret lié à ma pratique.
+## Stack technique
 
-L’objectif n’était pas de devenir développeur, mais de :
+- HTML / CSS / JavaScript (vanilla)
+- Stockage local (`localStorage`)
+- Synchronisation cloud via **Supabase** (PostgreSQL + API)
+- Hébergement de la version mobile : GitHub Pages
+
+## Fonctionnalités actuelles
+
+- Éditeur d’exercices sur terrain (drag & drop, dessin, formes)
+- Bibliothèque d’exercices et de séances
+- Création de séances à partir d’exercices
+- Sauvegarde locale
+- Synchronisation multi-appareils (PC ↔ smartphone) via Supabase
+- Impression / export
+
+## Contexte du projet
+
+Je n’ai que des bases en développement.  
+Ce projet a été conçu et développé avec l’aide d’une IA, à partir d’un besoin concret lié à ma pratique d’entraîneur.
+
+L’objectif n’était pas de devenir développeur full-stack, mais de :
+
 - Comprendre la logique d’une application complète
 - Apprendre en construisant quelque chose d’utile
-- Aller jusqu’à une version fonctionnelle et utilisable
+- Aboutir à un outil réellement utilisable au quotidien
 
-Il s’agit d’une ébauche déjà bien abouti pour mon usage : déjà utilisable au quotidien, mais perfectible (structure du code, évolutions fonctionnelles, etc.).
+Il s’agit d’une application déjà opérationnelle pour mon usage, encore perfectible (structure du code, authentification utilisateurs, etc.).
 
 ## Compétences / apprentissages
 
-Même avec un niveau débutant en code, ce projet m’a permis de travailler sur :
+Ce projet m’a permis de travailler concrètement sur :
+
 - La structuration d’une application web
-- La gestion de données côté client (localStorage)
+- La gestion de données côté client et côté cloud
 - L’organisation d’une interface utilisateur
 - L’itération progressive d’un outil
-- La résolution de problèmes concrets (sauvegarde, import/export, impression, organisation des séances…)
+- La résolution de problèmes concrets (sauvegarde, synchro, impression, organisation des séances)
+- La mise en place d’un backend simple (Supabase, tables, politiques d’accès)
 
 ## Utilisation
 
-1. Ouvrir le fichier HTML dans un navigateur moderne (Chrome ou Edge recommandés)
+1. Ouvrir la démo en ligne, ou le fichier HTML dans un navigateur moderne (Chrome / Edge)
 2. Créer des exercices sur le terrain
-3. Sauvegarder et organiser les séances
-4. Exporter ou imprimer selon les besoins
+3. Organiser des séances
+4. Sauvegarder (local + cloud selon la version)
 
 ## Évolutions envisagées
 
+- Authentification utilisateurs (chaque coach ses données)
+- Partage de séances entre entraîneurs
 - Amélioration de la structure du code
-- Mode deux terrains (situation initiale / situation après déplacement)
 - Amélioration de l’expérience d’impression
-- Nettoyage et clarification du code
+- Mode hors-ligne plus robuste
 
-## Sécurité
+## Sécurité / données
 
-HandCoach fonctionne entièrement côté client (aucune donnée n’est envoyée sur un serveur).
-
-Dans sa version actuelle, le projet n’intègre pas encore de mesures de sécurisation avancées :
-- Pas de validation stricte des fichiers importés
-- Pas de chiffrement des données sauvegardées
-- Stockage local en clair (localStorage / fichiers JSON)
-
-Ces points pourront être travaillés ultérieurement, notamment dans une logique d’amélioration de la robustesse de l’application.
+- Version actuelle : synchronisation via Supabase
+- Clé frontend (publishable) utilisée côté client
+- Row Level Security prévu pour isoler les données par utilisateur
+- Pas encore de comptes utilisateurs finalisés dans la version publique
 
 ## Auteur
 
-Projet personnel réalisé dans un contexte de reconversion / montée en compétences, en parallèle d’une formation en administration d’infrastructures sécurisées et d’une recherche d’emploi.
+Projet personnel réalisé dans un contexte de reconversion et de montée en compétences, en parallèle d’une formation en administration d’infrastructures sécurisées et d’une recherche d’emploi.
+
+Coach de handball – besoin terrain → outil numérique.
