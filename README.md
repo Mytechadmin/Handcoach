@@ -16,7 +16,6 @@ Application web permettant de :
 - Sauvegarder et synchroniser les données (local + cloud)
 - Imprimer / exporter pour utilisation sur le terrain
 
-**Démo :** [https://mytechadmin.github.io/handball-mobile/](https://mytechadmin.github.io/handball-mobile/)
 
 ## Stack technique
 
