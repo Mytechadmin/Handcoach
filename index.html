@@ -3796,7 +3796,23 @@ async function saveToSupabase() {
   // =========================================================
 
   async function initAuth() {
+sb.auth.onAuthStateChange(
+  async (event, session) => {
 
+    console.log(
+      'Auth event :',
+      event
+    );
+
+    currentUser = session?.user || null;
+
+    updateAuthUI();
+
+    if (event === 'PASSWORD_RECOVERY') {
+      openResetPasswordModal();
+    }
+  }
+);
     currentUser = await getCurrentUser();
 
     updateAuthUI();
@@ -3821,25 +3837,6 @@ async function saveToSupabase() {
       renderSidebar();
 
     }
-
-
-sb.auth.onAuthStateChange(
-  async (event, session) => {
-
-    console.log(
-      'Auth event :',
-      event
-    );
-
-    currentUser = session?.user || null;
-
-    updateAuthUI();
-
-    if (event === 'PASSWORD_RECOVERY') {
-      openResetPasswordModal();
-    }
-  }
-);
   }
 
 async function testInviteCode() {
