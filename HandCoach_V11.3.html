@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HandCoach V11.3</title>
+<title>HandCoach V11.4</title>
 <style>
 *{box-sizing:border-box}
 html,body{
@@ -273,6 +273,34 @@ summary.tree-summary{
     border: 1px solid #ccc;
     border-radius: 6px;
 }
+
+
+
+
+
+#shareSessionModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 99999;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+#shareSessionModal .auth-box {
+    display: block;
+    width: 500px;
+    max-width: 90vw;
+    box-sizing: border-box;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+}
+
 
 
 
@@ -806,7 +834,7 @@ summary.tree-summary{
 <body>
 
 <header class="header">
-    <h1>🤾 HandCoach V11.3</h1>
+    <h1>🤾 HandCoach V11.4</h1>
 
     <div class="spacer"></div>
 
@@ -1022,7 +1050,7 @@ summary.tree-summary{
 
 <script>
 /* =========================================================
-   HANDCOACH V11.3 — GUIDE RAPIDE
+   HANDCOACH V11.4 — GUIDE RAPIDE
 
    1. CONFIGURATION / STOCKAGE
    2. SAUVEGARDE DANS LE DOSSIER "Hand"
@@ -1046,7 +1074,7 @@ summary.tree-summary{
    1. CONFIGURATION / STOCKAGE
 ========================================================= */
 
-const APP_VERSION = "V11.3";
+const APP_VERSION = "V11.4";
 
 const EXERCISES_KEY = "handcoach_v10.3_exercises";
 const SESSIONS_KEY = "handcoach_v10.3_sessions";
@@ -2457,6 +2485,19 @@ deleteButton.onclick = event => {
     }
 };
 
+if (exercise.team_id) {
+    const unshareBtn = document.createElement("button");
+    unshareBtn.className = "del-btn";
+    unshareBtn.textContent = "🔗";
+    unshareBtn.title = "Retirer le partage";
+    unshareBtn.onclick = event => {
+        event.stopPropagation();
+        unshareExercise(exercise);
+    };
+    item.appendChild(unshareBtn);
+}
+
+
 item.appendChild(shareButton);
 item.appendChild(deleteButton);
             item.onclick = () => loadExercise(exercise);
@@ -2559,13 +2600,33 @@ item.appendChild(deleteButton);
                 }
             };
 
-            actions.appendChild(printButton);
-            actions.appendChild(deleteButton);
+const shareSessionButton = document.createElement("button");
+shareSessionButton.textContent = "🤝";
+shareSessionButton.title = "Partager la séance";
+shareSessionButton.onclick = event => {
+    event.stopPropagation();
+    openShareSessionModal(session);
+};
+
+actions.appendChild(printButton);
+actions.appendChild(shareSessionButton);
+actions.appendChild(deleteButton);
             sessionSummary.appendChild(actions);
             sessionDetails.appendChild(sessionSummary);
 
             const sessionContent = document.createElement("div");
             sessionContent.className = "tree-content session-drop-target";
+
+if (session.team_id) {
+    const unshareSessionBtn = document.createElement("button");
+    unshareSessionBtn.textContent = "🔗";
+    unshareSessionBtn.title = "Retirer le partage (séance + exercices)";
+    unshareSessionBtn.onclick = event => {
+        event.stopPropagation();
+        unshareSession(session);
+    };
+    actions.appendChild(unshareSessionBtn);
+}
 
             /* =====================================================
                AJOUT D'UN EXERCICE DANS UNE SÉANCE
@@ -2805,8 +2866,10 @@ if(localStorage.getItem(SESSIONS_KEY) === null && sessions.length){
     localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
 }
 
+exercises = [];
+sessions = [];
 renderSidebar();
-updateSaveStatus();
+if (typeof updateSaveStatus === 'function') updateSaveStatus();
 
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -2978,6 +3041,197 @@ async function confirmShareExercise() {
 }
 
 
+
+// =========================================================
+// PARTAGE D'UNE SÉANCE
+// =========================================================
+
+let sessionToShare = null;
+
+async function openShareSessionModal(session) {
+    if (!currentUser) {
+        showToast('❌ Connectez-vous d’abord');
+        return;
+    }
+
+    const modal = document.getElementById('shareSessionModal');
+    const name = document.getElementById('shareSessionName');
+    const select = document.getElementById('shareSessionTeamSelect');
+
+    if (!modal || !name || !select) {
+        console.error('❌ Modal partage séance introuvable');
+        return;
+    }
+
+    sessionToShare = session;
+    name.textContent = 'Séance : ' + (session.name || 'Sans titre');
+    select.innerHTML = '<option value="">Chargement...</option>';
+    modal.style.display = 'flex';
+
+    try {
+        const { data, error } = await sb
+            .from('teams')
+            .select('id, name, owner_id')
+            .eq('owner_id', currentUser.id)
+            .order('created_at', { ascending: true });
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            select.innerHTML = '<option value="">Aucune bibliothèque disponible</option>';
+            return;
+        }
+
+        select.innerHTML = '<option value="">Sélectionner une bibliothèque...</option>';
+
+        data.forEach(team => {
+            const option = document.createElement('option');
+            option.value = team.id;
+            option.textContent = team.name;
+            select.appendChild(option);
+        });
+    } catch (err) {
+        console.error(err);
+        select.innerHTML = '<option value="">Erreur de chargement</option>';
+        showToast('❌ ' + err.message);
+    }
+}
+
+function closeShareSessionModal() {
+    const modal = document.getElementById('shareSessionModal');
+    if (modal) modal.style.display = 'none';
+    sessionToShare = null;
+}
+
+async function confirmShareSession() {
+    if (!currentUser) {
+        showToast('❌ Connectez-vous d’abord');
+        return;
+    }
+    if (!sessionToShare) {
+        showToast('❌ Aucune séance sélectionnée');
+        return;
+    }
+
+    const select = document.getElementById('shareSessionTeamSelect');
+    const teamId = select?.value;
+
+    if (!teamId) {
+        showToast('⚠️ Sélectionnez une bibliothèque');
+        return;
+    }
+
+    try {
+    // 1. Partager la séance
+    const { error } = await sb.rpc('share_session_with_team', {
+        p_session_id: sessionToShare.id,
+        p_team_id: teamId
+    });
+    if (error) throw error;
+
+    // 2. Partager aussi les exercices de la séance
+    const exerciseIds = (sessionToShare.items || [])
+        .map(item => item.exerciseId)
+        .filter(Boolean);
+
+    const uniqueIds = [...new Set(exerciseIds)];
+
+    for (const exerciseId of uniqueIds) {
+        const { error: exError } = await sb.rpc('share_exercise_with_team', {
+            p_exercise_id: exerciseId,
+            p_team_id: teamId
+        });
+        // Si déjà partagé ou pas proprio, on ignore l'erreur
+        if (exError) {
+            console.warn('Exercice non partagé :', exerciseId, exError.message);
+        }
+    }
+
+    console.log('✅ Séance + exercices partagés :', sessionToShare.id, '→', teamId);
+    showToast('🤝 Séance et exercices partagés');
+    closeShareSessionModal();
+    await loadFromSupabase();
+
+} catch (err) {
+    console.error(err);
+    showToast('❌ ' + err.message);
+}
+
+
+}
+
+// =========================================================
+// RETRAIT DE PARTAGE
+// =========================================================
+
+async function unshareExercise(exercise) {
+    if (!currentUser) {
+        showToast('❌ Connectez-vous d’abord');
+        return;
+    }
+    if (!exercise?.id) return;
+
+    if (!confirm('Retirer le partage de cet exercice ?\nLes autres membres de la bibliothèque ne le verront plus.')) {
+        return;
+    }
+
+    try {
+        const { error } = await sb.rpc('unshare_exercise_from_team', {
+            p_exercise_id: exercise.id
+        });
+        if (error) throw error;
+
+        showToast('🔗 Partage exercice retiré');
+        await loadFromSupabase();
+    } catch (err) {
+        console.error(err);
+        showToast('❌ ' + err.message);
+    }
+}
+
+async function unshareSession(session) {
+    if (!currentUser) {
+        showToast('❌ Connectez-vous d’abord');
+        return;
+    }
+    if (!session?.id) return;
+
+    if (!confirm(
+        'Retirer le partage de cette séance ET de tous ses exercices ?\n' +
+        'Les autres membres ne les verront plus.'
+    )) {
+        return;
+    }
+
+    try {
+        // 1. Séance
+        const { error } = await sb.rpc('unshare_session_from_team', {
+            p_session_id: session.id
+        });
+        if (error) throw error;
+
+        // 2. Exercices de la séance
+        const exerciseIds = [...new Set(
+            (session.items || []).map(i => i.exerciseId).filter(Boolean)
+        )];
+
+        for (const exerciseId of exerciseIds) {
+            const { error: exError } = await sb.rpc('unshare_exercise_from_team', {
+                p_exercise_id: exerciseId
+            });
+            if (exError) {
+                console.warn('Exercice non retiré :', exerciseId, exError.message);
+            }
+        }
+
+        showToast('🔗 Partage séance + exercices retiré');
+        await loadFromSupabase();
+    } catch (err) {
+        console.error(err);
+        showToast('❌ ' + err.message);
+    }
+}
+
   // =========================================================
   // SUPABASE
   // =========================================================
@@ -3043,6 +3297,75 @@ async function confirmShareExercise() {
 
     await loadFromSupabase();
   }
+
+
+async function resetPassword() {
+    const email = document.getElementById('authEmail')?.value.trim();
+
+    if (!email) {
+        showToast('⚠️ Entre ton email d’abord');
+        return;
+    }
+
+    // --- DEBUT MODIF ---
+    // On utilise l'URL de la page actuellement ouverte (PC ou mobile)
+    // au lieu d'une URL fixe. Chaque version se redirige vers elle-même.
+    const redirectTo = window.location.origin + window.location.pathname;
+    // --- FIN MODIF ---
+
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+        redirectTo
+    });
+
+    if (error) {
+        console.error(error);
+        showToast('❌ ' + error.message);
+        return;
+    }
+
+    showToast('📧 Email de réinitialisation envoyé');
+    closeAuthModal();
+}
+
+function openResetPasswordModal() {
+  const modal = document.getElementById('resetPasswordModal');
+  if (modal) modal.style.display = 'flex';
+  const a = document.getElementById('newPassword');
+  const b = document.getElementById('newPasswordConfirm');
+  if (a) a.value = '';
+  if (b) b.value = '';
+}
+
+function closeResetPasswordModal() {
+  const modal = document.getElementById('resetPasswordModal');
+  if (modal) modal.style.display = 'none';
+}
+
+async function confirmNewPassword() {
+  const p1 = document.getElementById('newPassword')?.value || '';
+  const p2 = document.getElementById('newPasswordConfirm')?.value || '';
+
+  if (p1.length < 6) {
+    showToast('⚠️ Minimum 6 caractères');
+    return;
+  }
+  if (p1 !== p2) {
+    showToast('⚠️ Les mots de passe ne correspondent pas');
+    return;
+  }
+
+  const { error } = await sb.auth.updateUser({ password: p1 });
+  if (error) {
+    showToast('❌ ' + error.message);
+    return;
+  }
+
+  closeResetPasswordModal();
+  showToast('✅ Mot de passe mis à jour');
+  currentUser = (await sb.auth.getUser()).data.user;
+  updateAuthUI();
+  if (currentUser) await loadFromSupabase();
+}
 
 
   // =========================================================
@@ -3237,14 +3560,14 @@ async function loadFromSupabase() {
 
     if (exError) throw exError;
 
-    exercises = (exData || []).map(row => ({
-      id: row.id,
-      title: row.title,
-      category: row.category,
-      duration: row.duration,
-      team_id: row.team_id || null,
-      ...(row.data || {})
-    }));
+   exercises = (exData || []).map(row => ({
+  id: row.id,
+  title: row.title,
+  category: row.category,
+  duration: row.duration,
+  ...(row.data || {}),
+  team_id: row.team_id || null   // ← en dernier, gagne toujours
+}));
 
     // =====================================================
     // 3. Séances personnelles + séances partagées
@@ -3491,25 +3814,34 @@ async function saveToSupabase() {
 
     } else {
 
-      console.log(
-        'Aucun utilisateur connecté'
-      );
+      console.log('Aucun utilisateur connecté');
+
+      exercises = [];
+      sessions = [];
+      localStorage.setItem(EXERCISES_KEY, JSON.stringify([]));
+      localStorage.setItem(SESSIONS_KEY, JSON.stringify([]));
+      renderSidebar();
+
     }
 
 
-    sb.auth.onAuthStateChange(
-      async (event, session) => {
+sb.auth.onAuthStateChange(
+  async (event, session) => {
 
-        console.log(
-          'Auth event :',
-          event
-        );
-
-        currentUser = session?.user || null;
-
-        updateAuthUI();
-      }
+    console.log(
+      'Auth event :',
+      event
     );
+
+    currentUser = session?.user || null;
+
+    updateAuthUI();
+
+    if (event === 'PASSWORD_RECOVERY') {
+      openResetPasswordModal();
+    }
+  }
+);
   }
 
 async function testInviteCode() {
@@ -3889,9 +4221,7 @@ async function createInviteCodeFromUI(teamId, permission) {
 
 </script>
 <div id="authModal">
-
     <div class="auth-box">
-
         <h2>🔐 Connexion à HandCoach</h2>
 
         <input
@@ -3906,30 +4236,36 @@ async function createInviteCodeFromUI(teamId, permission) {
             placeholder="Mot de passe"
             autocomplete="current-password">
 
-        <div class="auth-buttons">
-
-            <button
-                class="auth-login"
-                onclick="loginUser()">
-                Se connecter
-            </button>
-
-            <button
-                class="auth-register"
-                onclick="registerUser()">
-                Créer un compte
-            </button>
-
-        </div>
-
         <button
-            class="auth-close"
-            onclick="closeAuthModal()">
-            Fermer
+            type="button"
+            onclick="resetPassword()"
+            style="
+                width:100%;
+                margin: 4px 0 10px 0;
+                padding: 8px;
+                border: none;
+                background: transparent;
+                color: #6c3fd1;
+                text-decoration: underline;
+                cursor: pointer;
+                font-size: 13px;
+            ">
+            Mot de passe oublié ?
         </button>
 
-    </div>
+        <div class="auth-buttons">
+            <button class="auth-login" onclick="loginUser()">
+                Se connecter
+            </button>
+            <button class="auth-register" onclick="registerUser()">
+                Créer un compte
+            </button>
+        </div>
 
+        <button class="auth-close" onclick="closeAuthModal()">
+            Fermer
+        </button>
+    </div>
 </div>
 
 
@@ -4022,6 +4358,36 @@ async function createInviteCodeFromUI(teamId, permission) {
 
     </div>
 
+</div>
+
+<!-- MODAL PARTAGE SÉANCE -->
+<div id="shareSessionModal">
+    <div class="auth-box">
+        <h2>🤝 Partager la séance</h2>
+        <p id="shareSessionName" style="margin-bottom:20px;"></p>
+        <label for="shareSessionTeamSelect">Bibliothèque :</label>
+        <select id="shareSessionTeamSelect"
+            style="width:100%; padding:10px; margin-top:8px; margin-bottom:20px; box-sizing:border-box;">
+        </select>
+        <div class="auth-buttons">
+            <button class="auth-login" onclick="confirmShareSession()">🤝 Partager</button>
+            <button class="auth-close" onclick="closeShareSessionModal()">Fermer</button>
+        </div>
+    </div>
+</div>
+
+<div id="resetPasswordModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:10001; align-items:center; justify-content:center;">
+  <div class="auth-box">
+    <h2>🔑 Nouveau mot de passe</h2>
+    <p style="font-size:13px; color:#666; margin-bottom:14px;">
+      Choisis un nouveau mot de passe (6 caractères minimum).
+    </p>
+    <input type="password" id="newPassword" placeholder="Nouveau mot de passe" autocomplete="new-password">
+    <input type="password" id="newPasswordConfirm" placeholder="Confirmer" autocomplete="new-password">
+    <div class="auth-buttons">
+      <button class="auth-login" onclick="confirmNewPassword()">Enregistrer</button>
+    </div>
+  </div>
 </div>
 
 
