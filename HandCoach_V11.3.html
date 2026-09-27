@@ -3308,8 +3308,6 @@ async function resetPassword() {
     }
 
     // --- DEBUT MODIF ---
-    // On utilise l'URL de la page actuellement ouverte (PC ou mobile)
-    // au lieu d'une URL fixe. Chaque version se redirige vers elle-même.
     const redirectTo = window.location.origin + window.location.pathname;
     // --- FIN MODIF ---
 
