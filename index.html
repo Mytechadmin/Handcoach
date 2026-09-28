@@ -3294,9 +3294,10 @@ async function unshareSession(session) {
     closeAuthModal();
 
     showToast('✅ Connexion réussie');
-
+    startIdleWatch();
     await loadFromSupabase();
   }
+
 
 
 async function resetPassword() {
@@ -3411,7 +3412,7 @@ async function confirmNewPassword() {
   // =========================================================
 
 async function logoutUser() {
-
+stopIdleWatch();
     const { error } = await sb.auth.signOut();
 
     if (error) {
@@ -3447,6 +3448,37 @@ if (passwordInput) {
     updateAuthUI();
 
     showToast('👋 Déconnexion réussie');
+}
+
+// =========================================================
+// DÉCONNEXION AUTO APRÈS INACTIVITÉ (PC = 10 min)
+// =========================================================
+
+const IDLE_LIMIT_MS = 15 * 1000; // 15 seconds
+let idleTimer = null;
+
+function resetIdleTimer() {
+    if (!currentUser) return;
+
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(async () => {
+        console.log('Inactivité : déconnexion automatique');
+        showToast('⏱️ Session expirée (inactivité)');
+        await logoutUser();
+    }, IDLE_LIMIT_MS);
+}
+
+function startIdleWatch() {
+    const events = ['click', 'keydown', 'mousemove', 'scroll', 'touchstart'];
+    events.forEach(evt => {
+        document.addEventListener(evt, resetIdleTimer, { passive: true });
+    });
+    resetIdleTimer();
+}
+
+function stopIdleWatch() {
+    clearTimeout(idleTimer);
+    idleTimer = null;
 }
 
   // =========================================================
@@ -3795,49 +3827,37 @@ async function saveToSupabase() {
   // INITIALISATION AUTH
   // =========================================================
 
-  async function initAuth() {
-sb.auth.onAuthStateChange(
-  async (event, session) => {
+async function initAuth() {
 
-    console.log(
-      'Auth event :',
-      event
-    );
+  currentUser = await getCurrentUser();
+  updateAuthUI();
 
-    currentUser = session?.user || null;
-
-    updateAuthUI();
-
-    if (event === 'PASSWORD_RECOVERY') {
-      openResetPasswordModal();
-    }
+  if (currentUser) {
+    console.log('Utilisateur connecté :', currentUser.email);
+    await loadFromSupabase();
+    startIdleWatch();
+  } else {
+    console.log('Aucun utilisateur connecté');
+    exercises = [];
+    sessions = [];
+    localStorage.setItem(EXERCISES_KEY, JSON.stringify([]));
+    localStorage.setItem(SESSIONS_KEY, JSON.stringify([]));
+    renderSidebar();
   }
-);
-    currentUser = await getCurrentUser();
 
-    updateAuthUI();
+  sb.auth.onAuthStateChange(
+    async (event, session) => {
+      console.log('Auth event :', event);
+      currentUser = session?.user || null;
+      updateAuthUI();
 
-    if (currentUser) {
-
-      console.log(
-        'Utilisateur connecté :',
-        currentUser.email
-      );
-
-      await loadFromSupabase();
-
-    } else {
-
-      console.log('Aucun utilisateur connecté');
-
-      exercises = [];
-      sessions = [];
-      localStorage.setItem(EXERCISES_KEY, JSON.stringify([]));
-      localStorage.setItem(SESSIONS_KEY, JSON.stringify([]));
-      renderSidebar();
-
+      if (event === 'PASSWORD_RECOVERY') {
+        openResetPasswordModal();
+      }
     }
-  }
+  );
+}
+    
 
 async function testInviteCode() {
     if (!currentUser) {
