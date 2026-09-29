@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HandCoach V11.4</title>
+<title>HandCoach V11.5</title>
 <style>
 *{box-sizing:border-box}
 html,body{
@@ -359,7 +360,64 @@ summary.tree-summary{
     width:100%; height:100%;
     touch-action:none;
 }
-.floor{fill:#e5b66d}
+.court-logo-image{
+    pointer-events:none;
+    display:none;
+}
+.settings-grid{
+    display:grid;
+    gap:14px;
+}
+.settings-card{
+    border:1px solid #d8dee6;
+    border-radius:9px;
+    padding:12px;
+    background:#f8fafc;
+}
+.settings-card h3{
+    margin:0 0 6px;
+    font-size:14px;
+}
+.settings-card p{
+    margin:0 0 10px;
+    color:#64748b;
+    font-size:12px;
+}
+.settings-file-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+}
+.settings-file-row input[type=file]{
+    flex:1;
+    min-width:220px;
+    padding:7px;
+    border:1px solid #cfd5db;
+    border-radius:6px;
+    background:#fff;
+}
+.settings-range-row{
+    display:grid;
+    grid-template-columns:110px 1fr 55px;
+    gap:9px;
+    align-items:center;
+    margin-top:10px;
+    font-size:12px;
+}
+.settings-range-row input[type=range]{width:100%;}
+.settings-range-value{
+    text-align:right;
+    font-weight:bold;
+    color:#287fe8;
+}
+.settings-status{
+    margin-top:10px;
+    min-height:17px;
+    font-size:12px;
+    color:#475569;
+}
+.floor{fill:#e5b66d;fill-opacity:.96}
 .court-border, .court-line, .court-strong, .court-dashed{ fill:none; stroke:#fff; }
 .court-border{stroke-width:.12}
 .court-line{stroke-width:.11}
@@ -862,9 +920,8 @@ summary.tree-summary{
     <button class="icon-button" id="newExercise" title="Fiche vierge" aria-label="Fiche vierge">📄</button>
     <button class="icon-button" id="saveExercise" title="Sauvegarder l'exercice" aria-label="Sauvegarder l'exercice">💾</button>
     <button class="icon-button" id="sessionButton" title="Nouvelle séance" aria-label="Nouvelle séance">📋</button>
-    <button class="icon-button" id="printButton" title="Imprimer l'exercice" aria-label="Imprimer l'exercice">🖨️</button> 
-    <button class="icon-button" id="exportButton" title="Exporter JSON" aria-label="Exporter JSON">📤</button>
-    <button class="icon-button" id="importButton" title="Importer JSON" aria-label="Importer JSON">📥</button>
+    <button class="icon-button" id="printButton" title="Imprimer l'exercice" aria-label="Imprimer l'exercice">🖨️</button>
+    <button class="icon-button" id="settingsButton" title="Personnaliser HandCoach" aria-label="Personnaliser HandCoach">🔧</button>
     
 </div>
 </header>
@@ -908,6 +965,7 @@ summary.tree-summary{
                 <div class="court-container" id="courtContainer">
                         <svg id="courtSvg" class="court-svg" viewBox="0 0 40 20" preserveAspectRatio="none">
                         <rect class="floor" x="0" y="0" width="40" height="20"/>
+                        <image class="court-logo-image" x="18" y="8" width="4" height="4" preserveAspectRatio="xMidYMid meet" href=""/>
                         <rect class="court-border" x="0" y="0" width="40" height="20"/>
                         <path class="court-strong" d="M20 0V20"/>
                         <circle class="court-line" cx="20" cy="10" r="1.8"/>
@@ -1048,6 +1106,50 @@ summary.tree-summary{
     </div>
 </div>
 
+<!-- MODALE PERSONNALISATION -->
+<div id="settingsModal" class="modal">
+    <div class="modal-box" style="width:min(620px,92vw);">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px;">
+            <h2 style="margin:0;">🔧 Personnaliser HandCoach</h2>
+            <button id="closeSettingsBtn" class="secondary" style="background:#3e4852; color:white; border:none; padding:8px 12px; border-radius:5px;">Fermer</button>
+        </div>
+
+        <div class="settings-grid">
+            <div class="settings-card">
+                <h3>🖼️ Fond de l'application</h3>
+                <p>Choisis une image pour personnaliser l'arrière-plan de ton HandCoach. Elle est enregistrée pour ton compte.</p>
+                <div class="settings-file-row">
+                    <input id="backgroundFile" type="file" accept="image/*">
+                    <button id="removeBackgroundBtn" class="secondary" type="button">Supprimer</button>
+                </div>
+            </div>
+
+            <div class="settings-card">
+                <h3>🛡️ Logo du club</h3>
+                <p>Le logo apparaît au centre du terrain, derrière les joueurs, ballons, formes et tracés.</p>
+                <div class="settings-file-row">
+                    <input id="logoFile" type="file" accept="image/*">
+                    <button id="removeLogoBtn" class="secondary" type="button">Supprimer</button>
+                </div>
+
+                <div class="settings-range-row">
+                    <label for="logoSizeRange">Taille</label>
+                    <input id="logoSizeRange" type="range" min="5" max="40" step="1" value="18">
+                    <span id="logoSizeValue" class="settings-range-value">18%</span>
+                </div>
+
+                <div class="settings-range-row">
+                    <label for="logoOpacityRange">Opacité</label>
+                    <input id="logoOpacityRange" type="range" min="0" max="100" step="1" value="25">
+                    <span id="logoOpacityValue" class="settings-range-value">25%</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="settingsStatus" class="settings-status"></div>
+    </div>
+</div>
+
 <script>
 /* =========================================================
    HANDCOACH V11.4 — GUIDE RAPIDE
@@ -1060,10 +1162,9 @@ summary.tree-summary{
    6. SÉLECTION / DÉPLACEMENT / REDIMENSIONNEMENT
    7. UNDO / REDO
    8. CHARGEMENT / SAUVEGARDE DES EXERCICES
-   9. IMPORT / EXPORT JSON
-   10. GESTION DES SÉANCES
-   11. IMPRESSION PDF
-   12. INITIALISATION
+   9. GESTION DES SÉANCES
+   10. IMPRESSION PDF
+   11. PERSONNALISATION / INITIALISATION
 
    ASTUCE : Ctrl+F puis cherche le nom d'une fonction.
    Exemple : cherche "createObject" pour modifier la création
@@ -1074,7 +1175,7 @@ summary.tree-summary{
    1. CONFIGURATION / STOCKAGE
 ========================================================= */
 
-const APP_VERSION = "V11.4";
+const APP_VERSION = "V11.5";
 
 const EXERCISES_KEY = "handcoach_v10.3_exercises";
 const SESSIONS_KEY = "handcoach_v10.3_sessions";
@@ -2155,63 +2256,6 @@ $("clearAll").onclick = clearAll;
 $("addCourtButton").onclick = addSecondCourt;
 
 /* =========================================================
-   9. IMPORT / EXPORT JSON
-========================================================= */
-
-function exportExercises(){
-    const blob = new Blob(
-        [JSON.stringify(exercises, null, 2)],
-        { type:"application/json" }
-    );
-
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-
-    link.href = url;
-    link.download = `handcoach_exercices_${Date.now()}.json`;
-    link.click();
-
-    URL.revokeObjectURL(url);
-}
-
-/* Boutons ajoutés dynamiquement sous la zone de travail. */
-
-
-
-// Champ fichier caché pour l'import
-const importFileInput = document.createElement("input");
-importFileInput.type = "file";
-importFileInput.accept = ".json";
-importFileInput.id = "importFile";
-importFileInput.hidden = true;
-document.body.appendChild(importFileInput);
-
-$("exportButton").onclick = exportExercises;
-$("importButton").onclick = () => $("importFile").click();
-
-$("importFile").onchange = event => {
-    const file = event.target.files[0];
-    if(!file) return;
-
-    const reader = new FileReader();
-    reader.onload = loadEvent => {
-        try{
-            const imported = JSON.parse(loadEvent.target.result);
-            if(!Array.isArray(imported)){
-                throw new Error("Le fichier ne contient pas une liste d'exercices.");
-            }
-            exercises = mergeById(exercises, imported);
-            saveStorage();
-            alert("Exercices importés avec succès !");
-        }catch(error){
-            alert("Fichier JSON invalide.\n\n" + error.message);
-        }
-    };
-    reader.readAsText(file);
-    event.target.value = "";
-};
-
-/* =========================================================
    10. GESTION DES SÉANCES
 ========================================================= */
 
@@ -3246,6 +3290,14 @@ async function unshareSession(session) {
 
   let currentUser = null;
 
+  /* Personnalisation propre à chaque compte. */
+  let userSettings = {
+      background_url: null,
+      logo_url: null,
+      logo_size: 18,
+      logo_opacity: 0.25
+  };
+
 
   // =========================================================
   // UTILISATEUR CONNECTÉ
@@ -3294,10 +3346,9 @@ async function unshareSession(session) {
     closeAuthModal();
 
     showToast('✅ Connexion réussie');
-    startIdleWatch();
+
     await loadFromSupabase();
   }
-
 
 
 async function resetPassword() {
@@ -3412,7 +3463,7 @@ async function confirmNewPassword() {
   // =========================================================
 
 async function logoutUser() {
-stopIdleWatch();
+
     const { error } = await sb.auth.signOut();
 
     if (error) {
@@ -3422,6 +3473,7 @@ stopIdleWatch();
     }
 
     currentUser = null;
+    resetUserSettings();
 
     exercises = [];
     sessions = [];
@@ -3448,37 +3500,6 @@ if (passwordInput) {
     updateAuthUI();
 
     showToast('👋 Déconnexion réussie');
-}
-
-// =========================================================
-// DÉCONNEXION AUTO APRÈS INACTIVITÉ (PC = 10 min)
-// =========================================================
-
-const IDLE_LIMIT_MS = 10 * 60; // 10 minutes
-let idleTimer = null;
-
-function resetIdleTimer() {
-    if (!currentUser) return;
-
-    clearTimeout(idleTimer);
-    idleTimer = setTimeout(async () => {
-        console.log('Inactivité : déconnexion automatique');
-        showToast('⏱️ Session expirée (inactivité)');
-        await logoutUser();
-    }, IDLE_LIMIT_MS);
-}
-
-function startIdleWatch() {
-    const events = ['click', 'keydown', 'mousemove', 'scroll', 'touchstart'];
-    events.forEach(evt => {
-        document.addEventListener(evt, resetIdleTimer, { passive: true });
-    });
-    resetIdleTimer();
-}
-
-function stopIdleWatch() {
-    clearTimeout(idleTimer);
-    idleTimer = null;
 }
 
   // =========================================================
@@ -3533,6 +3554,384 @@ function stopIdleWatch() {
     }
   }
 
+
+  // =========================================================
+  // PERSONNALISATION DU COMPTE
+  // =========================================================
+
+  function setSettingsStatus(message, isError = false){
+      const el = $("settingsStatus");
+      if(!el) return;
+      el.textContent = message || "";
+      el.style.color = isError ? "#b91c1c" : "#475569";
+  }
+
+  function resetUserSettings(){
+      userSettings = {
+          background_url: null,
+          logo_url: null,
+          logo_size: 18,
+          logo_opacity: 0.25
+      };
+      applyUserSettings();
+  }
+
+  function applyUserSettings(){
+      const backgroundUrl = userSettings.background_url || null;
+
+      if(backgroundUrl){
+          document.body.classList.add("handcoach-custom-background");
+          document.body.style.backgroundImage = `url("${String(backgroundUrl).replaceAll('"','\\"')}")`;
+      }else{
+          document.body.classList.remove("handcoach-custom-background");
+          document.body.style.backgroundImage = "";
+      }
+
+      const size = Math.max(5, Math.min(40, Number(userSettings.logo_size) || 18));
+      const opacity = Math.max(0, Math.min(1, Number(userSettings.logo_opacity) || 0));
+
+      document.querySelectorAll(".court-logo-image").forEach(image => {
+          if(!userSettings.logo_url){
+              image.style.display = "none";
+              image.setAttribute("href", "");
+              return;
+          }
+
+          /* 5–40% de la hauteur du terrain : le logo reste centré dans le cercle. */
+          const units = (size / 100) * 20;
+          image.setAttribute("x", String(20 - units / 2));
+          image.setAttribute("y", String(10 - units / 2));
+          image.setAttribute("width", String(units));
+          image.setAttribute("height", String(units));
+          image.setAttribute("opacity", String(opacity));
+          image.setAttribute("href", userSettings.logo_url);
+          image.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", userSettings.logo_url);
+          image.style.display = "block";
+      });
+
+      const sizeRange = $("logoSizeRange");
+      const opacityRange = $("logoOpacityRange");
+      const sizeValue = $("logoSizeValue");
+      const opacityValue = $("logoOpacityValue");
+
+      if(sizeRange) sizeRange.value = String(size);
+      if(opacityRange) opacityRange.value = String(Math.round(opacity * 100));
+      if(sizeValue) sizeValue.textContent = `${Math.round(size)}%`;
+      if(opacityValue) opacityValue.textContent = `${Math.round(opacity * 100)}%`;
+  }
+
+  async function loadUserSettings(){
+      if(!currentUser){
+          resetUserSettings();
+          return;
+      }
+
+      try{
+          const { data, error } = await sb
+              .from("user_settings")
+              .select("background_url, logo_url, logo_size, logo_opacity")
+              .eq("user_id", currentUser.id)
+              .maybeSingle();
+
+          if(error) throw error;
+
+          userSettings = {
+              background_url: data?.background_url || null,
+              logo_url: data?.logo_url || null,
+              logo_size: Number(data?.logo_size) || 18,
+              logo_opacity: data?.logo_opacity === null || data?.logo_opacity === undefined
+                  ? 0.25
+                  : Number(data.logo_opacity)
+          };
+
+          applyUserSettings();
+          setSettingsStatus("");
+      }catch(error){
+          console.error("Erreur chargement personnalisation :", error);
+          resetUserSettings();
+          setSettingsStatus("⚠️ Personnalisation indisponible : " + error.message, true);
+      }
+  }
+
+  async function saveUserSettings(){
+      if(!currentUser){
+          showToast("🔐 Connecte-toi pour enregistrer ta personnalisation");
+          return false;
+      }
+
+      const payload = {
+          user_id: currentUser.id,
+          background_url: userSettings.background_url || null,
+          logo_url: userSettings.logo_url || null,
+          logo_size: Math.max(5, Math.min(40, Number(userSettings.logo_size) || 18)),
+          logo_opacity: Math.max(0, Math.min(1, Number(userSettings.logo_opacity) || 0)),
+          updated_at: new Date().toISOString()
+      };
+
+      const { error } = await sb
+          .from("user_settings")
+          .upsert(payload, { onConflict: "user_id" });
+
+      if(error){
+          console.error("Erreur sauvegarde personnalisation :", error);
+          setSettingsStatus("❌ " + error.message, true);
+          showToast("❌ Impossible d'enregistrer la personnalisation");
+          return false;
+      }
+
+      userSettings = { ...userSettings, ...payload };
+      applyUserSettings();
+      setSettingsStatus("✅ Personnalisation enregistrée");
+      return true;
+  }
+
+  async function removeWhiteBackgroundFromLogo(file){
+      /*
+         On transforme le logo en PNG transparent.
+         Seules les zones blanches qui touchent le bord de l'image sont supprimées :
+         cela évite de supprimer les éléments blancs réellement présents dans le logo.
+      */
+      const imageUrl = URL.createObjectURL(file);
+
+      try{
+          const img = new Image();
+          img.decoding = "async";
+
+          await new Promise((resolve, reject) => {
+              img.onload = resolve;
+              img.onerror = reject;
+              img.src = imageUrl;
+          });
+
+          const maxDimension = 1800;
+          const scale = Math.min(1, maxDimension / Math.max(img.naturalWidth || img.width, img.naturalHeight || img.height));
+          const width = Math.max(1, Math.round((img.naturalWidth || img.width) * scale));
+          const height = Math.max(1, Math.round((img.naturalHeight || img.height) * scale));
+
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d", { willReadFrequently: true });
+          if(!ctx) throw new Error("Canvas indisponible");
+
+          ctx.clearRect(0, 0, width, height);
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const imageData = ctx.getImageData(0, 0, width, height);
+          const pixels = imageData.data;
+          const visited = new Uint8Array(width * height);
+          const queue = new Int32Array(width * height);
+          let head = 0;
+          let tail = 0;
+
+          /* Tolérance volontairement assez large pour les fonds blancs JPEG. */
+          const WHITE_TOLERANCE = 48;
+          const isWhiteBackgroundPixel = index => {
+              const a = pixels[index + 3];
+              if(a === 0) return true;
+
+              const r = pixels[index];
+              const g = pixels[index + 1];
+              const b = pixels[index + 2];
+              const distance = Math.sqrt((255-r)*(255-r) + (255-g)*(255-g) + (255-b)*(255-b));
+              return distance <= WHITE_TOLERANCE;
+          };
+
+          const addPixel = (x, y) => {
+              if(x < 0 || y < 0 || x >= width || y >= height) return;
+              const pixelNumber = y * width + x;
+              if(visited[pixelNumber]) return;
+              const index = pixelNumber * 4;
+              if(!isWhiteBackgroundPixel(index)) return;
+              visited[pixelNumber] = 1;
+              queue[tail++] = pixelNumber;
+          };
+
+          /* On part uniquement des quatre bords de l'image. */
+          for(let x = 0; x < width; x++){
+              addPixel(x, 0);
+              if(height > 1) addPixel(x, height - 1);
+          }
+          for(let y = 1; y < height - 1; y++){
+              addPixel(0, y);
+              if(width > 1) addPixel(width - 1, y);
+          }
+
+          while(head < tail){
+              const pixelNumber = queue[head++];
+              const x = pixelNumber % width;
+              const y = Math.floor(pixelNumber / width);
+              pixels[pixelNumber * 4 + 3] = 0;
+
+              addPixel(x - 1, y);
+              addPixel(x + 1, y);
+              addPixel(x, y - 1);
+              addPixel(x, y + 1);
+          }
+
+          ctx.putImageData(imageData, 0, 0);
+
+          const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+          if(!blob) throw new Error("Impossible de créer le PNG transparent");
+
+          return new File([blob], "handcoach-logo-transparent.png", { type: "image/png" });
+      } finally {
+          URL.revokeObjectURL(imageUrl);
+      }
+  }
+
+  async function uploadHandCoachAsset(file, kind){
+      if(!currentUser){
+          showToast("🔐 Connecte-toi pour personnaliser HandCoach");
+          return null;
+      }
+
+      if(!file || !file.type || !file.type.startsWith("image/")){
+          setSettingsStatus("❌ Sélectionne un fichier image.", true);
+          return null;
+      }
+
+      const maxSize = 8 * 1024 * 1024;
+      if(file.size > maxSize){
+          setSettingsStatus("❌ Image trop volumineuse (8 Mo maximum).", true);
+          return null;
+      }
+
+      setSettingsStatus("⏳ Préparation de l'image…");
+
+      let fileToUpload = file;
+      if(kind === "logo"){
+          try{
+              fileToUpload = await removeWhiteBackgroundFromLogo(file);
+          }catch(error){
+              console.error("Erreur de traitement du logo :", error);
+              setSettingsStatus("❌ Impossible de traiter le logo. Le fichier original sera utilisé.", true);
+              fileToUpload = file;
+          }
+      }
+
+      setSettingsStatus("⏳ Téléversement de l'image…");
+
+      const path = `${currentUser.id}/${kind}`;
+      const { error: uploadError } = await sb
+          .storage
+          .from("handcoach-assets")
+          .upload(path, fileToUpload, {
+              upsert: true,
+              contentType: fileToUpload.type,
+              cacheControl: "3600"
+          });
+
+      if(uploadError){
+          console.error("Erreur upload HandCoach :", uploadError);
+          setSettingsStatus("❌ " + uploadError.message, true);
+          return null;
+      }
+
+      const { data } = sb
+          .storage
+          .from("handcoach-assets")
+          .getPublicUrl(path);
+
+      if(!data?.publicUrl){
+          setSettingsStatus("❌ URL publique introuvable.", true);
+          return null;
+      }
+
+      /* Évite qu'un navigateur conserve l'ancienne image après remplacement. */
+      return `${data.publicUrl}?v=${Date.now()}`;
+  }
+
+  async function removeHandCoachAsset(kind, settingKey){
+      if(!currentUser) return;
+
+      setSettingsStatus("⏳ Suppression…");
+
+      const path = `${currentUser.id}/${kind}`;
+      const { error: storageError } = await sb
+          .storage
+          .from("handcoach-assets")
+          .remove([path]);
+
+      if(storageError){
+          console.warn("Suppression du fichier Storage :", storageError);
+      }
+
+      userSettings[settingKey] = null;
+      applyUserSettings();
+      await saveUserSettings();
+  }
+
+  function openSettingsModal(){
+      const modal = $("settingsModal");
+      if(!modal) return;
+
+      if(!currentUser){
+          showToast("🔐 Connecte-toi pour utiliser la personnalisation");
+          return;
+      }
+
+      applyUserSettings();
+      setSettingsStatus("");
+      modal.classList.add("visible");
+  }
+
+  function closeSettingsModal(){
+      const modal = $("settingsModal");
+      if(modal) modal.classList.remove("visible");
+  }
+
+  function setupSettingsUI(){
+      $("settingsButton")?.addEventListener("click", openSettingsModal);
+      $("closeSettingsBtn")?.addEventListener("click", closeSettingsModal);
+
+      $("settingsModal")?.addEventListener("click", event => {
+          if(event.target === $("settingsModal")) closeSettingsModal();
+      });
+
+      $("backgroundFile")?.addEventListener("change", async event => {
+          const file = event.target.files?.[0];
+          if(!file) return;
+
+          const url = await uploadHandCoachAsset(file, "background");
+          if(url){
+              userSettings.background_url = url;
+              applyUserSettings();
+              await saveUserSettings();
+          }
+          event.target.value = "";
+      });
+
+      $("logoFile")?.addEventListener("change", async event => {
+          const file = event.target.files?.[0];
+          if(!file) return;
+
+          const url = await uploadHandCoachAsset(file, "logo");
+          if(url){
+              userSettings.logo_url = url;
+              applyUserSettings();
+              await saveUserSettings();
+          }
+          event.target.value = "";
+      });
+
+      $("removeBackgroundBtn")?.addEventListener("click", () => removeHandCoachAsset("background", "background_url"));
+      $("removeLogoBtn")?.addEventListener("click", () => removeHandCoachAsset("logo", "logo_url"));
+
+      $("logoSizeRange")?.addEventListener("input", event => {
+          userSettings.logo_size = Number(event.target.value);
+          applyUserSettings();
+      });
+
+      $("logoSizeRange")?.addEventListener("change", saveUserSettings);
+
+      $("logoOpacityRange")?.addEventListener("input", event => {
+          userSettings.logo_opacity = Number(event.target.value) / 100;
+          applyUserSettings();
+      });
+
+      $("logoOpacityRange")?.addEventListener("change", saveUserSettings);
+  }
 
   // =========================================================
   // CHARGEMENT DEPUIS SUPABASE
@@ -3827,37 +4226,56 @@ async function saveToSupabase() {
   // INITIALISATION AUTH
   // =========================================================
 
-async function initAuth() {
+  async function initAuth() {
+sb.auth.onAuthStateChange(
+  async (event, session) => {
 
-  currentUser = await getCurrentUser();
-  updateAuthUI();
+    console.log(
+      'Auth event :',
+      event
+    );
 
-  if (currentUser) {
-    console.log('Utilisateur connecté :', currentUser.email);
-    await loadFromSupabase();
-    startIdleWatch();
-  } else {
-    console.log('Aucun utilisateur connecté');
-    exercises = [];
-    sessions = [];
-    localStorage.setItem(EXERCISES_KEY, JSON.stringify([]));
-    localStorage.setItem(SESSIONS_KEY, JSON.stringify([]));
-    renderSidebar();
-  }
+    currentUser = session?.user || null;
 
-  sb.auth.onAuthStateChange(
-    async (event, session) => {
-      console.log('Auth event :', event);
-      currentUser = session?.user || null;
-      updateAuthUI();
+    updateAuthUI();
 
-      if (event === 'PASSWORD_RECOVERY') {
-        openResetPasswordModal();
-      }
+    if (currentUser) {
+      await loadUserSettings();
+    } else {
+      resetUserSettings();
     }
-  );
-}
-    
+
+    if (event === 'PASSWORD_RECOVERY') {
+      openResetPasswordModal();
+    }
+  }
+);
+    currentUser = await getCurrentUser();
+
+    updateAuthUI();
+
+    if (currentUser) {
+
+      console.log(
+        'Utilisateur connecté :',
+        currentUser.email
+      );
+
+      await loadFromSupabase();
+      await loadUserSettings();
+
+    } else {
+
+      console.log('Aucun utilisateur connecté');
+
+      exercises = [];
+      sessions = [];
+      localStorage.setItem(EXERCISES_KEY, JSON.stringify([]));
+      localStorage.setItem(SESSIONS_KEY, JSON.stringify([]));
+      renderSidebar();
+
+    }
+  }
 
 async function testInviteCode() {
     if (!currentUser) {
@@ -4232,6 +4650,8 @@ async function createInviteCodeFromUI(teamId, permission) {
   }
 
 
+  setupSettingsUI();
+  applyUserSettings();
   initAuth();
 
 </script>
