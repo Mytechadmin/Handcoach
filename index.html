@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HandCoach V11.5</title>
+<title>HandCoach V11.6</title>
 <style>
 *{box-sizing:border-box}
 html,body{
@@ -361,8 +361,12 @@ summary.tree-summary{
     touch-action:none;
 }
 .court-logo-image{
-    pointer-events:none;
+    pointer-events:auto;
     display:none;
+    cursor:grab;
+}
+.court-logo-image:active{
+    cursor:grabbing;
 }
 .settings-grid{
     display:grid;
@@ -536,9 +540,12 @@ summary.tree-summary{
 .shape-resize-handle:hover{ background:#e0f2fe; }
 .freehand-path-selected{filter:drop-shadow(0 0 2px #00a8ff);}
 
-.player-purple{background:#783fb4;color:#fff}
-.player-orange{background:#e66c2e;color:#fff}
-.cone{background:#ffd21b;border-color:#987900;color:#665200}
+.player-purple{background:var(--color-a, #783fb4);color:#fff}
+.player-orange{background:var(--color-b, #e66c2e);color:#fff}
+.cone{background:var(--color-cone, #ffd21b);border-color:#987900;color:#665200}
+.tool-purple{background:var(--color-a, #783fb4)!important;color:#fff;border:none}
+.tool-orange{background:var(--color-b, #e66c2e)!important;color:#fff;border:none}
+.tool-yellow{background:var(--color-cone, #ffd21b)!important;color:#665200;border:none}
 .ball{
     width:24px; height:24px;
     display:flex; align-items:center; justify-content:center;
@@ -581,6 +588,35 @@ summary.tree-summary{
     background:#fff;
     font-weight:bold;
     padding:0 8px;
+}
+.palette-more-wrap{
+    position:relative;
+    display:inline-flex;
+    align-items:center;
+}
+.palette-more-panel{
+    display:none;
+    position:absolute;
+    left:0;
+    bottom:calc(100% + 8px);
+    z-index:200;
+    min-width:280px;
+    max-width:min(420px, 90vw);
+    padding:10px;
+    background:#fff;
+    border:1px solid #d5dbe1;
+    border-radius:10px;
+    box-shadow:0 10px 28px rgba(0,0,0,.18);
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+}
+.palette-more-panel.open{
+    display:flex;
+}
+.palette-more-panel .palette-title{
+    width:100%;
+    margin-top:4px;
 }
 .tool-purple{background:#783fb4;color:#fff;border:none}
 .tool-orange{background:#e66c2e;color:#fff;border:none}
@@ -969,8 +1005,8 @@ summary.tree-summary{
                         <rect class="court-border" x="0" y="0" width="40" height="20"/>
                         <path class="court-strong" d="M20 0V20"/>
                         <circle class="court-line" cx="20" cy="10" r="1.8"/>
-                        <path class="court-strong" d="M0 8.5V11.5"/>
-                        <path class="court-strong" d="M40 8.5V11.5"/>
+                        <path class="court-strong" d="M0 8.5V11.6"/>
+                        <path class="court-strong" d="M40 8.5V11.6"/>
                         <path class="court-strong" d="M0 4 A6 6 0 0 1 6 10 A6 6 0 0 1 0 16 M40 4 A6 6 0 0 0 34 10 A6 6 0 0 0 40 16"/>
                         <path class="court-dashed" d="M0 1 A9 9 0 0 1 9 10 A9 9 0 0 1 0 19 M40 1 A9 9 0 0 0 31 10 A9 9 0 0 0 40 19"/>
                         <path class="court-strong" d="M7 9.5V10.5M33 9.5V10.5"/>
@@ -982,79 +1018,52 @@ summary.tree-summary{
 
                 <div class="palette">
                     <span class="palette-title">PIONS :</span>
-                    <!-- =========================
-     PIONS
-     ========================= -->
 
-<button class="tool tool-purple" data-tool="player-purple">
-    Attaquant (A)
-</button>
+                    <button class="tool tool-purple" data-tool="player-purple">
+                        Attaquant (A)
+                    </button>
 
-<button class="tool tool-orange" data-tool="player-orange">
-    Défenseur (B)
-</button>
+                    <button class="tool tool-orange" data-tool="player-orange">
+                        Défenseur (B)
+                    </button>
 
-<button class="tool tool-yellow" data-tool="cone">
-    Plot
-</button>
+                    <button class="tool tool-yellow" data-tool="cone">
+                        Plot
+                    </button>
 
-<button class="tool tool-ball" data-tool="ball">
-    ⚽
-</button>
+                    <button class="tool tool-ball" data-tool="ball">
+                        ⚽
+                    </button>
 
+                    <div class="palette-more-wrap">
+                        <button type="button" class="tool" id="paletteMoreBtn" title="Autres outils">
+                            ＋ Outils
+                        </button>
 
-<!-- =========================
-     FORMES
-     Les formes peuvent maintenant être agrandies/réduites
-     avec la petite poignée bleue en bas à droite.
-     ========================= -->
+                        <div class="palette-more-panel" id="paletteMorePanel">
+                            <span class="palette-title">FORMES / TEXTE</span>
 
-<button class="tool" data-tool="shape-square">
-    ◻ Carré
-</button>
+                            <button class="tool" data-tool="shape-square">◻ Carré</button>
+                            <button class="tool" data-tool="shape-rectangle">▭ Rectangle</button>
+                            <button class="tool" data-tool="shape-triangle">△ Triangle</button>
+                            <button class="tool" data-tool="shape-circle">○ Cercle</button>
+                            <button class="tool" data-tool="text">Texte</button>
 
-<button class="tool" data-tool="shape-rectangle">
-    ▭ Rectangle
-</button>
-
-<button class="tool" data-tool="shape-triangle">
-    △ Triangle
-</button>
-
-<button class="tool" data-tool="shape-circle">
-    ○ Cercle
-</button>
-
-
-<!-- =========================
-     TEXTE
-     ========================= -->
-
-<button class="tool" data-tool="text">
-    Texte
-</button>
-
-                    <div class="color-picker">
-                        <span class="palette-title">CRAYON :</span>
-                        <button class="tool" id="pencilToolBtn">Dessiner</button>
-                        <select id="pencilWidth"
-        class="tool"
-        style="padding:0 4px;"
-        title="Épaisseur du trait">
-
-    <option value="0.04">Ultra fin</option>
-    <option value="0.08" selected>Très fin</option>
-    <option value="0.15">Fin</option>
-    <option value="0.30">Moyen</option>
-    <option value="0.50">Épais</option>
-
-</select>
-                        <div class="color-dot active" style="background:#222" data-color="#222"></div>
-                        <div class="color-dot" style="background:#2563eb" data-color="#2563eb"></div>
-                        <div class="color-dot" style="background:#dc2626" data-color="#dc2626"></div>
-                        <div class="color-dot" style="background:#ca8a04" data-color="#ca8a04"></div>
+                            <span class="palette-title">CRAYON</span>
+                            <button class="tool" id="pencilToolBtn">Dessiner</button>
+                            <select id="pencilWidth" class="tool" style="padding:0 4px;" title="Épaisseur du trait">
+                                <option value="0.04">Ultra fin</option>
+                                <option value="0.08" selected>Très fin</option>
+                                <option value="0.15">Fin</option>
+                                <option value="0.30">Moyen</option>
+                                <option value="0.50">Épais</option>
+                            </select>
+                            <div class="color-dot active" style="background:#222" data-color="#222"></div>
+                            <div class="color-dot" style="background:#2563eb" data-color="#2563eb"></div>
+                            <div class="color-dot" style="background:#dc2626" data-color="#dc2626"></div>
+                            <div class="color-dot" style="background:#ca8a04" data-color="#ca8a04"></div>
+                        </div>
                     </div>
-                    <button class="tool" id="clearDrawingsBtn">Effacer lignes</button>
                 </div>
             </section>
 
@@ -1143,6 +1152,41 @@ summary.tree-summary{
                     <input id="logoOpacityRange" type="range" min="0" max="100" step="1" value="25">
                     <span id="logoOpacityValue" class="settings-range-value">25%</span>
                 </div>
+                <div class="settings-range-row">
+    <label for="logoXRange">Gauche / Droite</label>
+    <input id="logoXRange" type="range" min="0" max="40" step="0.1" value="20">
+    <span id="logoXValue" class="settings-range-value">20</span>
+</div>
+
+<div class="settings-range-row">
+    <label for="logoYRange">Haut / Bas</label>
+    <input id="logoYRange" type="range" min="0" max="20" step="0.1" value="10">
+    <span id="logoYValue" class="settings-range-value">10</span>
+</div>
+
+<button type="button" id="positionLogoBtn"
+    style="margin-top:12px;width:100%;padding:10px;border:0;border-radius:7px;background:#287fe8;color:#fff;font-weight:bold;cursor:pointer;">
+    📍 Positionner le logo sur le terrain
+</button>
+            <div class="settings-card">
+                <h3>🎨 Couleurs terrain</h3>
+                <p>Joueurs A / B et plots. Appliqué tout de suite sur le terrain et la palette.</p>
+                <div class="settings-range-row">
+                    <label for="colorAPicker">Joueur A</label>
+                    <input id="colorAPicker" type="color" value="#783fb4" style="width:100%;height:32px;border:1px solid #cfd5db;border-radius:6px;">
+                    <span></span>
+                </div>
+                <div class="settings-range-row">
+                    <label for="colorBPicker">Joueur B</label>
+                    <input id="colorBPicker" type="color" value="#e66c2e" style="width:100%;height:32px;border:1px solid #cfd5db;border-radius:6px;">
+                    <span></span>
+                </div>
+                <div class="settings-range-row">
+                    <label for="colorConePicker">Plots</label>
+                    <input id="colorConePicker" type="color" value="#ffd21b" style="width:100%;height:32px;border:1px solid #cfd5db;border-radius:6px;">
+                    <span></span>
+                </div>
+            </div>
             </div>
         </div>
 
@@ -1175,7 +1219,7 @@ summary.tree-summary{
    1. CONFIGURATION / STOCKAGE
 ========================================================= */
 
-const APP_VERSION = "V11.5";
+const APP_VERSION = "V11.6";
 
 const EXERCISES_KEY = "handcoach_v10.3_exercises";
 const SESSIONS_KEY = "handcoach_v10.3_sessions";
@@ -1232,6 +1276,7 @@ let undoStack = [];
 let redoStack = [];
 let sessionSortState = null;
 let draggedExerciseId = null;
+let draggedSessionId = null;
 let sessionSuppressClickUntil = 0;
 
 /* Charge un tableau depuis localStorage, avec récupération des anciennes versions. */
@@ -1673,7 +1718,10 @@ function clearFreehandPaths(createUndo = true){
     selected = null;
 }
 
-$("clearDrawingsBtn").onclick = () => clearFreehandPaths(true);
+const clearDrawingsBtn = $("clearDrawingsBtn");
+if (clearDrawingsBtn) {
+    clearDrawingsBtn.onclick = () => clearFreehandPaths(true);
+}
 
 /* =========================================================
    5. OBJETS ET FORMES
@@ -1979,6 +2027,9 @@ function setupCourtInteractions(index){
 
     if(!container) return;
 
+    if (container.dataset.courtBound === "1") return;
+    container.dataset.courtBound = "1";
+
     container.addEventListener("pointerdown", event => {
 
         setActiveCourt(index);
@@ -1988,33 +2039,46 @@ function setupCourtInteractions(index){
         if(event.target.closest(".object, .text-object")) return;
 
         const rect = container.getBoundingClientRect();
+        if(!rect.width || !rect.height) return;
 
-        const x =
-            ((event.clientX - rect.left) / rect.width) * 100 + "%";
+        const x = ((event.clientX - rect.left) / rect.width) * 100 + "%";
+        const y = ((event.clientY - rect.top) / rect.height) * 100 + "%";
 
-        const y =
-            ((event.clientY - rect.top) / rect.height) * 100 + "%";
-
-        saveUndoPoint();
-
-        createObject(activeTool, x, y);
+        try {
+            if (typeof saveUndoPoint === "function") saveUndoPoint();
+            createObject(activeTool, x, y);
+            console.log("Pion posé :", activeTool, x, y);
+        } catch (err) {
+            console.error("Erreur pose pion :", err);
+        }
     });
 }
 
 /* Gestion des boutons de la palette. */
-document.querySelectorAll(".palette .tool[data-tool]").forEach(button => {
-    button.onclick = () => {
-        isPencilActive = false;
-        $("pencilToolBtn").classList.remove("active");
+const paletteEl = document.querySelector(".palette");
+if (paletteEl && !paletteEl.dataset.toolsBound) {
+    paletteEl.dataset.toolsBound = "1";
+    paletteEl.addEventListener("click", event => {
+        const button = event.target.closest(".tool[data-tool]");
+        if (!button || !paletteEl.contains(button)) return;
 
-        document.querySelectorAll(".palette .tool[data-tool]").forEach(b => {
+        if (typeof setLogoPositionMode === "function") {
+            setLogoPositionMode(false);
+        }
+
+        isPencilActive = false;
+        const pencilBtn = $("pencilToolBtn");
+        if (pencilBtn) pencilBtn.classList.remove("active");
+
+        paletteEl.querySelectorAll(".tool[data-tool]").forEach(b => {
             b.classList.remove("active");
         });
 
         activeTool = button.dataset.tool;
         button.classList.add("active");
-    };
-});
+        console.log("Outil actif :", activeTool);
+    });
+}
 
 setupCourtInteractions(0);
 
@@ -2386,7 +2450,7 @@ function printSession(sessionId){
                         <rect x="0" y="0" width="40" height="20" fill="none" stroke="#fff" stroke-width="0.12"/>
                         <path d="M20 0V20" fill="none" stroke="#fff" stroke-width="0.15"/>
                         <circle cx="20" cy="10" r="1.8" fill="none" stroke="#fff" stroke-width="0.11"/>
-                        <path d="M0 8.5V11.5M40 8.5V11.5" fill="none" stroke="#fff" stroke-width="0.15"/>
+                        <path d="M0 8.5V11.6M40 8.5V11.6" fill="none" stroke="#fff" stroke-width="0.15"/>
                         <path d="M0 4 A6 6 0 0 1 6 10 A6 6 0 0 1 0 16 M40 4 A6 6 0 0 0 34 10 A6 6 0 0 0 40 16" fill="none" stroke="#fff" stroke-width="0.15"/>
                         <path d="M0 1 A9 9 0 0 1 9 10 A9 9 0 0 1 0 19 M40 1 A9 9 0 0 0 31 10 A9 9 0 0 0 40 19" fill="none" stroke="#fff" stroke-width="0.11" stroke-dasharray="0.28 0.28"/>
                         <path d="M7 9.5V10.5M33 9.5V10.5M4 9.8V10.2M36 9.8V10.2" fill="none" stroke="#fff" stroke-width="0.15"/>
@@ -2576,6 +2640,68 @@ item.appendChild(deleteButton);
         const summary = document.createElement("summary");
         summary.className = "tree-summary";
         summary.textContent = `${category} (${categorySessions.length})`;
+        summary.title = "Double-clic pour renommer le thème";
+summary.addEventListener("dblclick", event => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const nouveau = prompt("Nouveau nom du thème :", category);
+    if (nouveau === null) return;
+
+    const nom = nouveau.trim();
+    if (!nom) {
+        alert("Le nom ne peut pas être vide.");
+        return;
+    }
+
+    sessions.forEach(session => {
+        if ((session.category || "Général") === category) {
+            session.category = nom;
+        }
+    });
+
+    if (typeof saveStorage === "function") {
+        saveStorage();
+    } else {
+        localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
+        renderSidebar();
+    }
+});
+
+summary.addEventListener("dragover", event => {
+    if (!draggedSessionId) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+    details.classList.add("drag-over");
+});
+
+summary.addEventListener("dragleave", () => {
+    details.classList.remove("drag-over");
+});
+
+summary.addEventListener("drop", event => {
+    event.preventDefault();
+    event.stopPropagation();
+    details.classList.remove("drag-over");
+
+    const id = draggedSessionId
+        || (event.dataTransfer.getData("text/session-id") || "");
+    if (!id) return;
+
+    const seance = sessions.find(s => s.id === id);
+    if (!seance) return;
+
+    seance.category = category;
+    draggedSessionId = null;
+
+    if (typeof saveStorage === "function") {
+        saveStorage();
+    } else {
+        localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
+        renderSidebar();
+    }
+});
+
         details.appendChild(summary);
 
         const content = document.createElement("div");
@@ -2593,16 +2719,38 @@ item.appendChild(deleteButton);
             const sessionSummary = document.createElement("summary");
             sessionSummary.className = "tree-summary";
             sessionSummary.style.background = "#edf6ff";
+            sessionSummary.draggable = true;
+sessionSummary.title = (sessionSummary.title || "") + " — Glisser vers un thème pour déplacer";
+
+sessionSummary.addEventListener("dragstart", event => {
+    draggedSessionId = session.id;
+    draggedExerciseId = null;
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/session-id", session.id);
+    event.dataTransfer.setData("text/plain", "session:" + session.id);
+    sessionSummary.style.opacity = "0.5";
+});
+
+sessionSummary.addEventListener("dragend", () => {
+    draggedSessionId = null;
+    sessionSummary.style.opacity = "";
+    document.querySelectorAll("#sessionsTree details.tree-group").forEach(el => {
+        el.classList.remove("drag-over");
+    });
+});
 
             const totalDuration = (session.items || []).reduce(
                 (total, item) => total + (parseInt(item.duration) || 0), 0
             );
 
-            sessionSummary.innerHTML = `
-                <span>📋 ${session.name}
-                    <small style="color:#64748b; font-weight:normal;">(${totalDuration}m)</small>
-                </span>
-            `;
+           sessionSummary.innerHTML = `
+    <span>📋 ${session.name}
+        <small style="color:#64748b; font-weight:normal;">(${totalDuration}m)</small>
+    </span>
+    <span class="tree-actions">
+        <button type="button" class="sess-theme-btn" title="Changer le thème">📁</button>
+    </span>
+`;
 
 	    sessionSummary.addEventListener("dblclick", event => {
     		             event.preventDefault();
@@ -2616,6 +2764,32 @@ item.appendChild(deleteButton);
   		        alert("Le nom ne peut pas être vide.");
     		           return;
 	      }
+
+
+const themeBtn = sessionSummary.querySelector(".sess-theme-btn");
+if (themeBtn) {
+    themeBtn.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const nouveauTheme = prompt(
+            "Thème de la séance :",
+            session.category || "Général"
+        );
+        if (nouveauTheme === null) return;
+
+        const theme = nouveauTheme.trim() || "Général";
+        session.category = theme;
+
+        if (typeof saveStorage === "function") {
+            saveStorage();
+        } else {
+            localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
+            renderSidebar();
+        }
+    });
+}
+
 
    			   session.name = nom;
     			   saveStorage();
@@ -3293,9 +3467,15 @@ async function unshareSession(session) {
   /* Personnalisation propre à chaque compte. */
   let userSettings = {
       background_url: null,
-      logo_url: null,
-      logo_size: 18,
-      logo_opacity: 0.25
+     logo_url: null,
+logo_size: 18,
+logo_opacity: 0.25,
+logo_x: 20,
+logo_y: 10
+,
+color_a: '#783fb4',
+color_b: '#e66c2e',
+color_cone: '#ffd21b'
   };
 
 
@@ -3570,13 +3750,87 @@ if (passwordInput) {
       userSettings = {
           background_url: null,
           logo_url: null,
-          logo_size: 18,
-          logo_opacity: 0.25
+logo_size: 18,
+logo_opacity: 0.25,
+logo_x: 20,
+logo_y: 10
+,
+color_a: '#783fb4',
+color_b: '#e66c2e',
+color_cone: '#ffd21b'
       };
       applyUserSettings();
   }
 
-  function applyUserSettings(){
+
+  let logoDrag = null;
+  let logoPositionMode = false;
+
+  function svgPointFromEvent(svg, event){
+      const rect = svg.getBoundingClientRect();
+      const x = ((event.clientX - rect.left) / rect.width) * 40;
+      const y = ((event.clientY - rect.top) / rect.height) * 20;
+      return {
+          x: Math.max(0, Math.min(40, x)),
+          y: Math.max(0, Math.min(20, y))
+      };
+  }
+
+  function setLogoPositionMode(on){
+      logoPositionMode = !!on;
+      document.querySelectorAll(".draw-layer").forEach(layer => {
+          layer.style.pointerEvents = on ? "none" : "";
+      });
+      document.querySelectorAll(".court-logo-image").forEach(image => {
+          image.style.pointerEvents = on && userSettings.logo_url ? "auto" : "none";
+          image.style.cursor = on ? "grab" : "default";
+          image.style.outline = on ? "2px solid #287fe8" : "none";
+      });
+  }
+
+  function setupLogoDrag(image){
+      if(!image || image.dataset.dragReady === "1") return;
+      image.dataset.dragReady = "1";
+
+      image.addEventListener("pointerdown", event => {
+          if(!logoPositionMode || !userSettings.logo_url) return;
+          event.preventDefault();
+          event.stopPropagation();
+          const svg = image.closest("svg");
+          if(!svg) return;
+          logoDrag = { image, svg };
+          image.setPointerCapture(event.pointerId);
+      });
+
+      image.addEventListener("pointermove", event => {
+          if(!logoDrag || logoDrag.image !== image) return;
+          const pt = svgPointFromEvent(logoDrag.svg, event);
+          userSettings.logo_x = Math.round(pt.x * 10) / 10;
+          userSettings.logo_y = Math.round(pt.y * 10) / 10;
+          applyUserSettings();
+          setLogoPositionMode(true);
+      });
+
+      image.addEventListener("pointerup", async event => {
+          if(!logoDrag || logoDrag.image !== image) return;
+          logoDrag = null;
+          try { image.releasePointerCapture(event.pointerId); } catch(e) {}
+          if(typeof saveUserSettings === "function") await saveUserSettings();
+          setLogoPositionMode(false);
+          showToast("✅ Position du logo enregistrée");
+      });
+  }
+   function applyUserSettings(){
+          document.documentElement.style.setProperty('--color-a', userSettings.color_a || '#783fb4');
+      document.documentElement.style.setProperty('--color-b', userSettings.color_b || '#e66c2e');
+      document.documentElement.style.setProperty('--color-cone', userSettings.color_cone || '#ffd21b');
+
+      const colorA = $('colorAPicker');
+      const colorB = $('colorBPicker');
+      const colorCone = $('colorConePicker');
+      if (colorA) colorA.value = userSettings.color_a || '#783fb4';
+      if (colorB) colorB.value = userSettings.color_b || '#e66c2e';
+      if (colorCone) colorCone.value = userSettings.color_cone || '#ffd21b';
       const backgroundUrl = userSettings.background_url || null;
 
       if(backgroundUrl){
@@ -3589,6 +3843,12 @@ if (passwordInput) {
 
       const size = Math.max(5, Math.min(40, Number(userSettings.logo_size) || 18));
       const opacity = Math.max(0, Math.min(1, Number(userSettings.logo_opacity) || 0));
+      const units = (size / 100) * 20;
+
+      const cx = Number(userSettings.logo_x);
+      const cy = Number(userSettings.logo_y);
+      const posX = Number.isFinite(cx) ? cx : 20;
+      const posY = Number.isFinite(cy) ? cy : 10;
 
       document.querySelectorAll(".court-logo-image").forEach(image => {
           if(!userSettings.logo_url){
@@ -3597,27 +3857,34 @@ if (passwordInput) {
               return;
           }
 
-          /* 5–40% de la hauteur du terrain : le logo reste centré dans le cercle. */
-          const units = (size / 100) * 20;
-          image.setAttribute("x", String(20 - units / 2));
-          image.setAttribute("y", String(10 - units / 2));
+          image.setAttribute("x", String(posX - units / 2));
+          image.setAttribute("y", String(posY - units / 2));
           image.setAttribute("width", String(units));
           image.setAttribute("height", String(units));
           image.setAttribute("opacity", String(opacity));
           image.setAttribute("href", userSettings.logo_url);
           image.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", userSettings.logo_url);
           image.style.display = "block";
+                    setupLogoDrag(image);
       });
 
       const sizeRange = $("logoSizeRange");
       const opacityRange = $("logoOpacityRange");
       const sizeValue = $("logoSizeValue");
       const opacityValue = $("logoOpacityValue");
+      const xRange = $("logoXRange");
+      const yRange = $("logoYRange");
+      const xValue = $("logoXValue");
+      const yValue = $("logoYValue");
 
       if(sizeRange) sizeRange.value = String(size);
       if(opacityRange) opacityRange.value = String(Math.round(opacity * 100));
       if(sizeValue) sizeValue.textContent = `${Math.round(size)}%`;
       if(opacityValue) opacityValue.textContent = `${Math.round(opacity * 100)}%`;
+      if(xRange) xRange.value = String(posX);
+      if(yRange) yRange.value = String(posY);
+      if(xValue) xValue.textContent = String(posX);
+      if(yValue) yValue.textContent = String(posY);
   }
 
   async function loadUserSettings(){
@@ -3629,7 +3896,7 @@ if (passwordInput) {
       try{
           const { data, error } = await sb
               .from("user_settings")
-              .select("background_url, logo_url, logo_size, logo_opacity")
+              .select("background_url, logo_url, logo_size, logo_opacity, logo_x, logo_y, color_a, color_b, color_cone")
               .eq("user_id", currentUser.id)
               .maybeSingle();
 
@@ -3641,7 +3908,12 @@ if (passwordInput) {
               logo_size: Number(data?.logo_size) || 18,
               logo_opacity: data?.logo_opacity === null || data?.logo_opacity === undefined
                   ? 0.25
-                  : Number(data.logo_opacity)
+                  : Number(data.logo_opacity),
+              logo_x: Number(data?.logo_x) || 20,
+              logo_y: Number(data?.logo_y) || 10,
+              color_a: data?.color_a || '#783fb4',
+              color_b: data?.color_b || '#e66c2e',
+              color_cone: data?.color_cone || '#ffd21b'
           };
 
           applyUserSettings();
@@ -3665,6 +3937,11 @@ if (passwordInput) {
           logo_url: userSettings.logo_url || null,
           logo_size: Math.max(5, Math.min(40, Number(userSettings.logo_size) || 18)),
           logo_opacity: Math.max(0, Math.min(1, Number(userSettings.logo_opacity) || 0)),
+          logo_x: Number.isFinite(Number(userSettings.logo_x)) ? Number(userSettings.logo_x) : 20,
+          logo_y: Number.isFinite(Number(userSettings.logo_y)) ? Number(userSettings.logo_y) : 10,
+          color_a: userSettings.color_a || '#783fb4',
+          color_b: userSettings.color_b || '#e66c2e',
+          color_cone: userSettings.color_cone || '#ffd21b',
           updated_at: new Date().toISOString()
       };
 
@@ -3931,8 +4208,46 @@ if (passwordInput) {
       });
 
       $("logoOpacityRange")?.addEventListener("change", saveUserSettings);
-  }
+            $("logoXRange")?.addEventListener("input", event => {
+          userSettings.logo_x = Number(event.target.value);
+          applyUserSettings();
+      });
+      $("logoXRange")?.addEventListener("change", saveUserSettings);
 
+           $("logoYRange")?.addEventListener("input", event => {
+          userSettings.logo_y = Number(event.target.value);
+          applyUserSettings();
+      });
+      $("logoYRange")?.addEventListener("change", saveUserSettings);
+
+      $("positionLogoBtn")?.addEventListener("click", () => {
+          if(!userSettings.logo_url){
+              showToast("⚠️ Ajoute d’abord un logo");
+              return;
+          }
+          closeSettingsModal();
+          setLogoPositionMode(true);
+          showToast("📍 Glisse le logo, puis relâche");
+      });
+      $("colorAPicker")?.addEventListener("input", event => {
+          userSettings.color_a = event.target.value;
+          applyUserSettings();
+      });
+      $("colorAPicker")?.addEventListener("change", saveUserSettings);
+
+      $("colorBPicker")?.addEventListener("input", event => {
+          userSettings.color_b = event.target.value;
+          applyUserSettings();
+      });
+      $("colorBPicker")?.addEventListener("change", saveUserSettings);
+
+      $("colorConePicker")?.addEventListener("input", event => {
+          userSettings.color_cone = event.target.value;
+          applyUserSettings();
+      });
+      $("colorConePicker")?.addEventListener("change", saveUserSettings);
+
+  }
   // =========================================================
   // CHARGEMENT DEPUIS SUPABASE
   // =========================================================
@@ -4652,6 +4967,26 @@ async function createInviteCodeFromUI(teamId, permission) {
 
   setupSettingsUI();
   applyUserSettings();
+
+
+(function setupPaletteMoreMenu(){
+    const btn = document.getElementById("paletteMoreBtn");
+    const panel = document.getElementById("paletteMorePanel");
+    if(!btn || !panel) return;
+
+    btn.addEventListener("click", event => {
+        event.stopPropagation();
+        panel.classList.toggle("open");
+    });
+
+    document.addEventListener("click", event => {
+        if(!panel.classList.contains("open")) return;
+        if(panel.contains(event.target) || btn.contains(event.target)) return;
+        panel.classList.remove("open");
+    });
+})();
+
+
   initAuth();
 
 </script>
