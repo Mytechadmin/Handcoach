@@ -1414,6 +1414,8 @@ function addSecondCourt(){
     const secondCourt = firstCourt.cloneNode(true);
 
     secondCourt.id = "courtContainer2";
+    /* FIX : le clone ne doit pas hériter du flag "déjà branché" du 1er terrain */
+    delete secondCourt.dataset.courtBound;
 
     const svg = secondCourt.querySelector("#courtSvg");
     if(svg){
