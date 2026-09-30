@@ -2,7 +2,9 @@
 
 Application web de création d’entraînements de handball.
 
-HandCoach est né d’un besoin réel : en tant qu’entraîneur de handball, pouvoir créer et organiser facilement des exercices et des séances, avec un support visuel clair, imprimable, et accessible sur ordinateur comme sur téléphone.
+HandCoach est né d’un besoin réel : en tant qu’entraîneur, pouvoir créer et organiser facilement des exercices et des séances, avec un support visuel clair, imprimable, et utilisable au quotidien.
+
+---
 
 ## Présentation
 
@@ -13,25 +15,52 @@ Application web permettant de :
 - Dessiner des trajectoires et consignes tactiques
 - Classer les exercices par catégories
 - Construire des séances à partir des exercices
-- Sauvegarder et synchroniser les données (local + cloud)
+- Sauvegarder et synchroniser les données (cloud Supabase)
+- Partager des bibliothèques d’exercices entre coachs
 - Imprimer / exporter pour utilisation sur le terrain
+- Personnaliser l’interface (logo club, couleurs, fond)
 
+---
 
 ## Stack technique
 
 - HTML / CSS / JavaScript (vanilla)
-- Stockage local (`localStorage`)
-- Synchronisation cloud via **Supabase** (PostgreSQL + API)
-- Hébergement de la version mobile : GitHub Pages
+- Stockage local (`localStorage`) en cache
+- Synchronisation cloud via **Supabase** (Auth + PostgreSQL + Storage)
+- Hébergement possible : Netlify, GitHub Pages, ou ouverture directe du fichier HTML
+
+---
 
 ## Fonctionnalités actuelles
 
-- Éditeur d’exercices sur terrain (drag & drop, dessin, formes)
-- Bibliothèque d’exercices et de séances
-- Création de séances à partir d’exercices
-- Sauvegarde locale
-- Synchronisation multi-appareils (PC ↔ smartphone) via Supabase
-- Impression / export
+### Éditeur
+- Terrain de handball interactif (drag & drop)
+- Joueurs A/B, plots, ballons, formes géométriques, texte
+- Dessin libre (crayon) avec couleurs et épaisseurs
+- Second terrain « Évolution »
+- Annuler / rétablir
+- Champs : mise en place, consignes, variantes, objectifs, durée
+
+### Organisation
+- Bibliothèque d’exercices par catégories
+- Création de séances (glisser-déposer d’exercices)
+- Réordonnancement des exercices dans une séance
+- Impression d’un exercice ou d’une séance complète
+
+### Compte & cloud
+- Connexion / inscription (e-mail + mot de passe)
+- Réinitialisation de mot de passe
+- Sauvegarde cloud par utilisateur
+- Bibliothèques partagées (codes d’invitation lecture / modification)
+- Partage d’exercices et de séances vers une bibliothèque
+- Déconnexion automatique après inactivité (timer côté app)
+
+### Personnalisation
+- Logo du club sur le terrain
+- Couleurs des joueurs et plots
+- Image de fond
+
+---
 
 ## Contexte du projet
 
@@ -44,43 +73,57 @@ L’objectif n’était pas de devenir développeur full-stack, mais de :
 - Apprendre en construisant quelque chose d’utile
 - Aboutir à un outil réellement utilisable au quotidien
 
-Il s’agit d’une application déjà opérationnelle pour mon usage, encore perfectible (structure du code, authentification utilisateurs, etc.).
+Application déjà opérationnelle pour mon usage, encore perfectible (structure du code, UX, etc.).
+
+---
 
 ## Compétences / apprentissages
 
 Ce projet m’a permis de travailler concrètement sur :
 
 - La structuration d’une application web
-- La gestion de données côté client et côté cloud
+- La gestion de données côté client et cloud
+- L’authentification utilisateurs (Supabase Auth)
+- Les politiques d’accès et le partage de données
 - L’organisation d’une interface utilisateur
 - L’itération progressive d’un outil
-- La résolution de problèmes concrets (sauvegarde, synchro, impression, organisation des séances)
-- La mise en place d’un backend simple (Supabase, tables, politiques d’accès)
+- La résolution de problèmes concrets (sauvegarde, synchro, impression, second terrain, sessions)
+
+---
 
 ## Utilisation
 
-1. Ouvrir la démo en ligne, ou le fichier HTML dans un navigateur moderne (Chrome / Edge)
-2. Créer des exercices sur le terrain
-3. Organiser des séances
-4. Sauvegarder (local + cloud selon la version)
+1. Ouvrir la démo en ligne, ou le fichier HTML dans Chrome / Edge
+2. Créer un compte ou se connecter
+3. Créer des exercices sur le terrain
+4. Organiser des séances
+5. Sauvegarder (synchronisation cloud automatique)
+6. Imprimer si besoin pour le terrain
+
+---
 
 ## Évolutions envisagées
 
-- Authentification utilisateurs (chaque coach ses données)
-- Partage de séances entre entraîneurs
-- Amélioration de la structure du code
-- Amélioration de l’expérience d’impression
 - Mode hors-ligne plus robuste
+- Amélioration de l’expérience d’impression
+- Refactoring / structure du code
+- Améliorations UX (mobile + desktop)
+- Gestion fine des rôles dans les bibliothèques
+
+---
 
 ## Sécurité / données
 
-- Version actuelle : synchronisation via Supabase
-- Clé frontend (publishable) utilisée côté client
-- Row Level Security prévu pour isoler les données par utilisateur
-- Pas encore de comptes utilisateurs finalisés dans la version publique
+- Authentification Supabase (e-mail / mot de passe)
+- Données isolées par utilisateur
+- Bibliothèques partagées via codes d’invitation
+- Clé frontend (publishable) côté client — les règles d’accès sont côté Supabase (RLS)
+- Déconnexion après inactivité configurable dans l’app
+
+---
 
 ## Auteur
 
 Projet personnel réalisé dans un contexte de reconversion et de montée en compétences, en parallèle d’une formation en administration d’infrastructures sécurisées et d’une recherche d’emploi.
 
-Coach de handball – besoin terrain → outil numérique.
+Coach de handball — besoin terrain → outil numérique.
