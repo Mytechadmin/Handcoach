@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HandCoach V12</title>
+<title>HandCoach V12.1</title>
 <style>
 *{box-sizing:border-box}
 html,body{
@@ -192,53 +192,112 @@ details.sidebar-section:not([open]) > summary.sidebar-section-title{
 .sidebar-section-body{
     padding:6px;
 }
-/* Bulle flottante « À placer » en bas de la barre latérale */
+/* Bulle BD flottante « À placer » — petit nuage vivant */
 .pending-dock{
     position:sticky;
-    bottom:8px;
+    bottom:14px;
     margin-top:auto;
     z-index:50;
-    padding:10px;
-    border-radius:14px;
-    background:linear-gradient(145deg, #fff7ed 0%, #ffedd5 100%);
-    border:2px solid #fb923c;
-    box-shadow:0 8px 24px rgba(234,88,12,.28), 0 0 0 0 rgba(251,146,60,.45);
-    animation:pendingPulse 2.2s ease-in-out infinite;
+    padding:12px 14px 14px;
+    /* Forme de nuage / bulle BD */
+    border-radius:22px 26px 24px 20px / 24px 22px 28px 20px;
+    background:
+        radial-gradient(ellipse 80% 60% at 20% 30%, rgba(255,255,255,.9), transparent 55%),
+        radial-gradient(ellipse 70% 50% at 80% 70%, rgba(255,237,213,.85), transparent 50%),
+        linear-gradient(160deg, #fffbeb 0%, #ffedd5 45%, #fed7aa 100%);
+    border:2.5px solid #1e293b;
+    box-shadow:
+        3px 4px 0 #1e293b,
+        0 12px 28px rgba(15,23,42,.12);
+    animation:cloudFloat 4.5s ease-in-out infinite;
+    transform-origin:center bottom;
 }
 .pending-dock.empty{ display:none; }
+
+/* Queue de bulle BD (pointe vers le haut / menus) */
+.pending-dock::before{
+    content:"";
+    position:absolute;
+    top:-12px;
+    left:28px;
+    width:18px;
+    height:18px;
+    background:#fffbeb;
+    border-left:2.5px solid #1e293b;
+    border-top:2.5px solid #1e293b;
+    transform:rotate(45deg);
+    border-radius:3px 0 0 0;
+    z-index:1;
+}
+/* Petite ombre de la queue façon BD */
+.pending-dock::after{
+    content:"";
+    position:absolute;
+    top:-6px;
+    left:48px;
+    width:10px;
+    height:10px;
+    background:#ffedd5;
+    border:2px solid #1e293b;
+    border-radius:50%;
+    opacity:.9;
+    animation:cloudPuff 3.2s ease-in-out infinite;
+}
 .pending-dock-header{
     font-size:11px;
     font-weight:bold;
-    color:#c2410c;
-    margin-bottom:6px;
+    color:#9a3412;
+    margin-bottom:8px;
     display:flex;
     align-items:center;
     gap:6px;
+    position:relative;
+    z-index:2;
 }
 .pending-dock-header .pulse-dot{
-    width:8px;
-    height:8px;
+    width:9px;
+    height:9px;
     border-radius:50%;
     background:#ea580c;
-    animation:pendingDot 1.2s ease-in-out infinite;
+    border:1.5px solid #1e293b;
+    animation:pendingDot 1.4s ease-in-out infinite;
+    flex:0 0 auto;
 }
 .pending-dock .tree-item{
-    background:#fff;
-    border-color:#fdba74;
-    margin-bottom:4px;
-    animation:pendingSlideIn .35s ease;
+    background:rgba(255,255,255,.92);
+    border:1.5px solid #1e293b;
+    border-radius:10px;
+    margin-bottom:5px;
+    box-shadow:1px 2px 0 #1e293b;
+    animation:pendingSlideIn .4s cubic-bezier(.2,.9,.3,1.2);
+    position:relative;
+    z-index:2;
 }
 .pending-dock .tree-item:last-child{ margin-bottom:0; }
-@keyframes pendingPulse{
-    0%, 100%{ box-shadow:0 8px 24px rgba(234,88,12,.28), 0 0 0 0 rgba(251,146,60,.4); }
-    50%{ box-shadow:0 8px 28px rgba(234,88,12,.38), 0 0 0 8px rgba(251,146,60,0); }
+.pending-dock .tree-item:hover{
+    background:#fff;
+    transform:translateY(-1px);
+}
+
+/* Flotte comme un petit nuage */
+@keyframes cloudFloat{
+    0%{ transform:translateY(0) translateX(0) rotate(0deg); }
+    20%{ transform:translateY(-7px) translateX(3px) rotate(1.2deg); }
+    40%{ transform:translateY(-3px) translateX(-2px) rotate(-0.8deg); }
+    60%{ transform:translateY(-10px) translateX(2px) rotate(0.6deg); }
+    80%{ transform:translateY(-4px) translateX(-3px) rotate(-1deg); }
+    100%{ transform:translateY(0) translateX(0) rotate(0deg); }
+}
+@keyframes cloudPuff{
+    0%, 100%{ transform:scale(1) translate(0,0); opacity:.85; }
+    50%{ transform:scale(1.25) translate(3px,-2px); opacity:.5; }
 }
 @keyframes pendingDot{
     0%, 100%{ transform:scale(1); opacity:1; }
-    50%{ transform:scale(1.35); opacity:.55; }
+    50%{ transform:scale(1.4); opacity:.55; }
 }
 @keyframes pendingSlideIn{
-    from{ opacity:0; transform:translateY(10px) scale(.96); }
+    from{ opacity:0; transform:translateY(12px) scale(.9); }
     to{ opacity:1; transform:translateY(0) scale(1); }
 }
 details.tree-group{
@@ -1081,7 +1140,7 @@ details.tree-group.exercise-cat-drop.drag-over > .tree-summary{
 <body>
 
 <header class="header">
-    <h1>🤾 HandCoach V12</h1>
+    <h1>🤾 HandCoach V12.1</h1>
 
     <div class="spacer"></div>
 
@@ -1136,11 +1195,11 @@ details.tree-group.exercise-cat-drop.drag-over > .tree-summary{
             </div>
         </details>
 
-        <!-- Bulle flottante : nouveaux éléments en attente de classement -->
-        <div id="pendingDock" class="pending-dock empty">
+        <!-- Bulle BD vivante : nouveaux éléments en attente de classement -->
+        <div id="pendingDock" class="pending-dock empty" aria-live="polite">
             <div class="pending-dock-header">
-                <span class="pulse-dot"></span>
-                <span>À placer — glisse vers le bon endroit</span>
+                <span class="pulse-dot" aria-hidden="true"></span>
+                <span>💭 À placer — glisse-moi au bon endroit</span>
             </div>
             <div id="pendingDockList"></div>
         </div>
@@ -1415,7 +1474,7 @@ details.tree-group.exercise-cat-drop.drag-over > .tree-summary{
    1. CONFIGURATION / STOCKAGE
 ========================================================= */
 
-const APP_VERSION = "V12";
+const APP_VERSION = "V12.1";
 
 const EXERCISES_KEY = "handcoach_v10.3_exercises";
 const SESSIONS_KEY = "handcoach_v10.3_sessions";
