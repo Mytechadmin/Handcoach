@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HandCoach <V11 class="9"></V11></title>
+<title>HandCoach V11.9</title>
 <style>
 *{box-sizing:border-box}
 html,body{
@@ -86,6 +86,8 @@ button{cursor:pointer}
     border-right:1px solid #d4d9df;
     padding:12px;
     overflow-y:auto;
+    display:flex;
+    flex-direction:column;
 }
 details.sidebar-section{
     margin-bottom:8px;
@@ -126,26 +128,54 @@ details.sidebar-section:not([open]) > summary.sidebar-section-title{
 .sidebar-section-body{
     padding:6px;
 }
-.pending-zone{
-    margin-top:6px;
-    padding:6px;
-    border:2px dashed #94a3b8;
-    border-radius:7px;
-    background:#f8fafc;
+/* Bulle flottante « À placer » en bas de la barre latérale */
+.pending-dock{
+    position:sticky;
+    bottom:8px;
+    margin-top:auto;
+    z-index:50;
+    padding:10px;
+    border-radius:14px;
+    background:linear-gradient(145deg, #fff7ed 0%, #ffedd5 100%);
+    border:2px solid #fb923c;
+    box-shadow:0 8px 24px rgba(234,88,12,.28), 0 0 0 0 rgba(251,146,60,.45);
+    animation:pendingPulse 2.2s ease-in-out infinite;
 }
-.pending-zone-title{
-    font-size:10px;
+.pending-dock.empty{ display:none; }
+.pending-dock-header{
+    font-size:11px;
     font-weight:bold;
-    text-transform:uppercase;
-    color:#64748b;
-    margin-bottom:4px;
+    color:#c2410c;
+    margin-bottom:6px;
+    display:flex;
+    align-items:center;
+    gap:6px;
 }
-.pending-zone.empty{
-    display:none;
+.pending-dock-header .pulse-dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#ea580c;
+    animation:pendingDot 1.2s ease-in-out infinite;
 }
-.pending-zone .tree-item{
-    background:#fff7ed;
+.pending-dock .tree-item{
+    background:#fff;
     border-color:#fdba74;
+    margin-bottom:4px;
+    animation:pendingSlideIn .35s ease;
+}
+.pending-dock .tree-item:last-child{ margin-bottom:0; }
+@keyframes pendingPulse{
+    0%, 100%{ box-shadow:0 8px 24px rgba(234,88,12,.28), 0 0 0 0 rgba(251,146,60,.4); }
+    50%{ box-shadow:0 8px 28px rgba(234,88,12,.38), 0 0 0 8px rgba(251,146,60,0); }
+}
+@keyframes pendingDot{
+    0%, 100%{ transform:scale(1); opacity:1; }
+    50%{ transform:scale(1.35); opacity:.55; }
+}
+@keyframes pendingSlideIn{
+    from{ opacity:0; transform:translateY(10px) scale(.96); }
+    to{ opacity:1; transform:translateY(0) scale(1); }
 }
 details.tree-group{
     margin-bottom:4px;
@@ -1023,24 +1053,27 @@ details.tree-group.exercise-cat-drop.drag-over > .tree-summary{
 
 <div class="app">
     <aside class="sidebar">
-        <details class="sidebar-section" id="exercisesSection" open>
+        <details class="sidebar-section" id="exercisesSection">
             <summary class="sidebar-section-title">Exercices</summary>
             <div class="sidebar-section-body">
                 <div id="exercisesTree"></div>
-                <div id="pendingExercises" class="pending-zone empty">
-                    <div class="pending-zone-title">📥 À classer — glisse vers une catégorie</div>
-                </div>
             </div>
         </details>
-        <details class="sidebar-section" id="sessionsSection" open>
+        <details class="sidebar-section" id="sessionsSection">
             <summary class="sidebar-section-title">Séances</summary>
             <div class="sidebar-section-body">
                 <div id="sessionsTree"></div>
-                <div id="pendingSessions" class="pending-zone empty">
-                    <div class="pending-zone-title">📥 À classer — glisse vers un thème</div>
-                </div>
             </div>
         </details>
+
+        <!-- Bulle flottante : nouveaux éléments en attente de classement -->
+        <div id="pendingDock" class="pending-dock empty">
+            <div class="pending-dock-header">
+                <span class="pulse-dot"></span>
+                <span>À placer — glisse vers le bon endroit</span>
+            </div>
+            <div id="pendingDockList"></div>
+        </div>
     </aside>
 
     <main id="main" class="main">
@@ -1079,8 +1112,8 @@ details.tree-group.exercise-cat-drop.drag-over > .tree-summary{
                         <rect class="court-border" x="0" y="0" width="40" height="20"/>
                         <path class="court-strong" d="M20 0V20"/>
                         <circle class="court-line" cx="20" cy="10" r="1.8"/>
-                        <path class="court-strong" d="M0 8.5V11.9"/>
-                        <path class="court-strong" d="M40 8.5V11.9"/>
+                        <path class="court-strong" d="M0 8.5V11.6"/>
+                        <path class="court-strong" d="M40 8.5V11.6"/>
                         <path class="court-strong" d="M0 4 A6 6 0 0 1 6 10 A6 6 0 0 1 0 16 M40 4 A6 6 0 0 0 34 10 A6 6 0 0 0 40 16"/>
                         <path class="court-dashed" d="M0 1 A9 9 0 0 1 9 10 A9 9 0 0 1 0 19 M40 1 A9 9 0 0 0 31 10 A9 9 0 0 0 40 19"/>
                         <path class="court-strong" d="M7 9.5V10.5M33 9.5V10.5"/>
@@ -1293,7 +1326,7 @@ details.tree-group.exercise-cat-drop.drag-over > .tree-summary{
    1. CONFIGURATION / STOCKAGE
 ========================================================= */
 
-const APP_VERSION = "V11.9";
+const APP_VERSION = "11.9";
 
 const EXERCISES_KEY = "handcoach_v10.3_exercises";
 const SESSIONS_KEY = "handcoach_v10.3_sessions";
@@ -2571,13 +2604,10 @@ async function saveCurrentExercise(){
         currentId = data.id;
     }
 
-    const exSection = $("exercisesSection");
-    if(exSection) exSection.open = true;
-
     saveStorage();
 
     if(isNew && data.category === "À classer"){
-        showToast("📥 Exercice en « À classer » — glisse-le vers une catégorie");
+        showToast("📥 Nouvel exercice dans la bulle — glisse-le vers une catégorie");
     }
 }
 
@@ -2619,16 +2649,12 @@ $("saveSessionBtn").onclick = async () => {
 
     forceOpenSessionId = newId;
 
-    /* Ouvre le menu Séances */
-    const sessSection = $("sessionsSection");
-    if(sessSection) sessSection.open = true;
-
     saveStorage();
 
     $("sessionModal").classList.remove("visible");
     showToast(category === "À classer"
-        ? "📋 Séance créée — classe-la en la glissant vers un thème"
-        : "📋 Séance créée — glisse tes exercices dedans");
+        ? "📋 Nouvelle séance dans la bulle — glisse-la vers un thème"
+        : "📋 Séance créée — ouvre Séances pour y glisser des exercices");
 };
 
 /* =========================================================
@@ -2935,59 +2961,150 @@ function renderSidebar(){
         exerciseContainer.appendChild(details);
     });
 
-    /* Zone « À classer » en bas — exercices en attente de catégorie */
-    const pendingExBox = $("pendingExercises");
-    if(pendingExBox){
-        const pendingExercises = exercises.filter(ex =>
-            !ex.category || ex.category === "À classer" ||
-            !categories.includes(ex.category)
-        );
-        /* Garde le titre, vide le reste */
-        pendingExBox.innerHTML = `<div class="pending-zone-title">📥 À classer — glisse vers une catégorie</div>`;
-        if(pendingExercises.length === 0){
-            pendingExBox.classList.add("empty");
-        }else{
-            pendingExBox.classList.remove("empty");
-            pendingExercises.forEach(exercise => {
-                const item = document.createElement("div");
-                item.className = "tree-item" + (exercise.id === currentId ? " active" : "");
-                item.draggable = true;
-                item.innerHTML = `
-                    <span>📄 ${exercise.title || "Sans titre"}
-                        <small>(${exercise.duration || 15}m)</small>
-                    </span>
-                `;
-                item.ondragstart = event => {
-                    draggedExerciseId = exercise.id;
-                    event.dataTransfer.effectAllowed = "copyMove";
-                    event.dataTransfer.setData("text/plain", exercise.id);
-                };
-                item.ondragend = () => {
-                    draggedExerciseId = null;
-                    document.querySelectorAll("#exercisesTree details.tree-group").forEach(el => {
-                        el.classList.remove("drag-over");
-                    });
-                };
-                const deleteButton = document.createElement("button");
-                deleteButton.className = "del-btn";
-                deleteButton.textContent = "✕";
-                deleteButton.title = "Supprimer l'exercice";
-                deleteButton.onclick = event => {
-                    event.stopPropagation();
-                    if(confirm(`Supprimer l'exercice "${exercise.title}" ?`)){
-                        exercises = exercises.filter(ex => ex.id !== exercise.id);
-                        if(currentId === exercise.id) resetFormToBlank();
-                        saveStorage();
-                    }
-                };
-                item.appendChild(deleteButton);
-                item.onclick = () => loadExercise(exercise);
-                pendingExBox.appendChild(item);
-            });
-        }
+    renderSessionsTree(openStates.sessions);
+    renderPendingDock();
+}
+
+/* =========================================================
+   BULLE FLOTTANTE « À PLACER »
+========================================================= */
+function renderPendingDock(){
+    const dock = $("pendingDock");
+    const list = $("pendingDockList");
+    if(!dock || !list) return;
+
+    const knownCategories = [
+        "Attaque", "Défense", "Échauffement", "Montée de balle",
+        "Jeu à thème", "Gardien", "Physique"
+    ];
+
+    const pendingExercises = exercises.filter(ex =>
+        !ex.category || ex.category === "À classer" || !knownCategories.includes(ex.category)
+    );
+    const pendingSessionsList = sessions.filter(s =>
+        !s.category || s.category === "À classer"
+    );
+
+    list.innerHTML = "";
+
+    if(pendingExercises.length === 0 && pendingSessionsList.length === 0){
+        dock.classList.add("empty");
+        return;
     }
 
-    renderSessionsTree(openStates.sessions);
+    dock.classList.remove("empty");
+
+    pendingExercises.forEach(exercise => {
+        const item = document.createElement("div");
+        item.className = "tree-item" + (exercise.id === currentId ? " active" : "");
+        item.draggable = true;
+        item.innerHTML = `
+            <span>📄 ${exercise.title || "Sans titre"}
+                <small>(${exercise.duration || 15}m)</small>
+            </span>
+        `;
+        item.title = "Glisser vers une catégorie d'exercices";
+        item.ondragstart = event => {
+            draggedExerciseId = exercise.id;
+            draggedSessionId = null;
+            event.dataTransfer.effectAllowed = "copyMove";
+            event.dataTransfer.setData("text/plain", exercise.id);
+            /* Ouvre le menu Exercices pour voir les catégories cibles */
+            const sec = $("exercisesSection");
+            if(sec) sec.open = true;
+        };
+        item.ondragend = () => {
+            draggedExerciseId = null;
+            document.querySelectorAll("#exercisesTree details.tree-group").forEach(el => {
+                el.classList.remove("drag-over");
+            });
+        };
+        const deleteButton = document.createElement("button");
+        deleteButton.className = "del-btn";
+        deleteButton.textContent = "✕";
+        deleteButton.title = "Supprimer";
+        deleteButton.onclick = event => {
+            event.stopPropagation();
+            if(confirm(`Supprimer l'exercice "${exercise.title}" ?`)){
+                exercises = exercises.filter(ex => ex.id !== exercise.id);
+                if(currentId === exercise.id) resetFormToBlank();
+                saveStorage();
+            }
+        };
+        item.appendChild(deleteButton);
+        item.onclick = () => loadExercise(exercise);
+        list.appendChild(item);
+    });
+
+    pendingSessionsList.forEach(session => {
+        const row = document.createElement("div");
+        row.className = "tree-item";
+        row.draggable = true;
+        const totalDuration = (session.items || []).reduce(
+            (total, item) => total + (parseInt(item.duration) || 0), 0
+        );
+        row.innerHTML = `
+            <span>📋 ${session.name}
+                <small>(${totalDuration}m)</small>
+            </span>
+        `;
+        row.title = "Glisser vers un thème de séances";
+        row.ondragstart = event => {
+            draggedSessionId = session.id;
+            draggedExerciseId = null;
+            event.dataTransfer.effectAllowed = "move";
+            event.dataTransfer.setData("text/session-id", session.id);
+            event.dataTransfer.setData("text/plain", "session:" + session.id);
+            const sec = $("sessionsSection");
+            if(sec) sec.open = true;
+        };
+        row.ondragend = () => {
+            draggedSessionId = null;
+            document.querySelectorAll("#sessionsTree details.tree-group").forEach(el => {
+                el.classList.remove("drag-over");
+            });
+        };
+        /* Dépôt d'exercices sur la séance en attente */
+        row.addEventListener("dragover", event => {
+            if(!draggedExerciseId) return;
+            event.preventDefault();
+            event.dataTransfer.dropEffect = "copy";
+            row.style.outline = "2px dashed #287fe8";
+        });
+        row.addEventListener("dragleave", () => { row.style.outline = ""; });
+        row.addEventListener("drop", event => {
+            event.preventDefault();
+            event.stopPropagation();
+            row.style.outline = "";
+            const exerciseId = draggedExerciseId
+                || (event.dataTransfer && event.dataTransfer.getData("text/plain"))
+                || "";
+            if(!exerciseId || String(exerciseId).startsWith("session:")) return;
+            const exercise = exercises.find(ex => ex.id === exerciseId);
+            if(!exercise) return;
+            if(!Array.isArray(session.items)) session.items = [];
+            session.items.push({
+                exerciseId: exercise.id,
+                duration: exercise.duration || "15"
+            });
+            draggedExerciseId = null;
+            saveStorage();
+            showToast(`✅ Exercice ajouté à « ${session.name} »`);
+        });
+        const deleteButton = document.createElement("button");
+        deleteButton.className = "del-btn";
+        deleteButton.textContent = "✕";
+        deleteButton.title = "Supprimer la séance";
+        deleteButton.onclick = event => {
+            event.stopPropagation();
+            if(confirm("Supprimer cette séance ?")){
+                sessions = sessions.filter(item => item.id !== session.id);
+                saveStorage();
+            }
+        };
+        row.appendChild(deleteButton);
+        list.appendChild(row);
+    });
 }
 
   function renderSessionsTree(savedOpenStates = {}){
@@ -3454,92 +3571,6 @@ if (session.team_id) {
         details.appendChild(content);
         sessionContainer.appendChild(details);
     });
-
-    /* Zone « À classer » pour les séances sans thème */
-    const pendingSeBox = $("pendingSessions");
-    if(pendingSeBox){
-        const pendingSessionsList = sessions.filter(s =>
-            !s.category || s.category === "À classer"
-        );
-        pendingSeBox.innerHTML = `<div class="pending-zone-title">📥 À classer — glisse vers un thème</div>`;
-        if(pendingSessionsList.length === 0){
-            pendingSeBox.classList.add("empty");
-        }else{
-            pendingSeBox.classList.remove("empty");
-            pendingSessionsList.forEach(session => {
-                const row = document.createElement("div");
-                row.className = "tree-item";
-                row.draggable = true;
-                const totalDuration = (session.items || []).reduce(
-                    (total, item) => total + (parseInt(item.duration) || 0), 0
-                );
-                row.innerHTML = `
-                    <span>📋 ${session.name}
-                        <small>(${totalDuration}m)</small>
-                    </span>
-                `;
-                row.title = "Glisser vers un thème pour classer la séance";
-                row.ondragstart = event => {
-                    draggedSessionId = session.id;
-                    draggedExerciseId = null;
-                    event.dataTransfer.effectAllowed = "move";
-                    event.dataTransfer.setData("text/session-id", session.id);
-                    event.dataTransfer.setData("text/plain", "session:" + session.id);
-                };
-                row.ondragend = () => {
-                    draggedSessionId = null;
-                    document.querySelectorAll("#sessionsTree details.tree-group").forEach(el => {
-                        el.classList.remove("drag-over");
-                    });
-                };
-                /* Accepte aussi des exercices glissés dedans (même sans thème) */
-                row.addEventListener("dragover", event => {
-                    if(!draggedExerciseId) return;
-                    event.preventDefault();
-                    event.dataTransfer.dropEffect = "copy";
-                    row.style.outline = "2px dashed #287fe8";
-                });
-                row.addEventListener("dragleave", () => {
-                    row.style.outline = "";
-                });
-                row.addEventListener("drop", event => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    row.style.outline = "";
-                    const exerciseId = draggedExerciseId
-                        || (event.dataTransfer && event.dataTransfer.getData("text/plain"))
-                        || "";
-                    if(!exerciseId || String(exerciseId).startsWith("session:")) return;
-                    const exercise = exercises.find(ex => ex.id === exerciseId);
-                    if(!exercise) return;
-                    if(!Array.isArray(session.items)) session.items = [];
-                    session.items.push({
-                        exerciseId: exercise.id,
-                        duration: exercise.duration || "15"
-                    });
-                    draggedExerciseId = null;
-                    saveStorage();
-                    showToast(`✅ Exercice ajouté à « ${session.name} »`);
-                });
-                row.onclick = () => {
-                    showToast("💡 Glisse la séance vers un thème, ou glisse des exercices dessus");
-                };
-                const deleteButton = document.createElement("button");
-                deleteButton.className = "del-btn";
-                deleteButton.textContent = "✕";
-                deleteButton.title = "Supprimer la séance";
-                deleteButton.onclick = event => {
-                    event.stopPropagation();
-                    if(confirm("Supprimer cette séance ?")){
-                        sessions = sessions.filter(item => item.id !== session.id);
-                        saveStorage();
-                    }
-                };
-                row.appendChild(deleteButton);
-                pendingSeBox.appendChild(row);
-            });
-        }
-    }
 
     /* Une fois rendu, on n'impose plus l'ouverture (l'état DOM sera mémorisé) */
     forceOpenSessionId = null;
