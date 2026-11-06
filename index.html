@@ -108,8 +108,10 @@ button{cursor:pointer}
 /* BARRE LATÉRALE & ARBORESCENCE */
 .sidebar{
     width:320px;
-    background:#fff;
-    border-right:1px solid #d4d9df;
+    background:rgba(255,255,255,.72);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    border-right:1px solid rgba(212,217,223,.75);
     padding:12px;
     overflow-y:auto;
     display:flex;
@@ -117,9 +119,9 @@ button{cursor:pointer}
 }
 details.sidebar-section{
     margin-bottom:8px;
-    border:1px solid #d4d9df;
+    border:1px solid rgba(212,217,223,.85);
     border-radius:8px;
-    background:#fff;
+    background:rgba(255,255,255,.82);
     overflow:hidden;
 }
 details.sidebar-section > summary.sidebar-section-title{
@@ -128,8 +130,8 @@ details.sidebar-section > summary.sidebar-section-title{
     text-transform:uppercase;
     margin:0;
     color:#1e293b;
-    background:#f1f5f9;
-    border-bottom:1px solid #e2e8f0;
+    background:rgba(241,245,249,.9);
+    border-bottom:1px solid rgba(226,232,240,.9);
     padding:8px 10px;
     cursor:pointer;
     list-style:none;
@@ -352,7 +354,7 @@ details.tree-group:not([open]) > .tree-summary{
     border-radius:3px;
 }
 .tree-actions button:hover{ background:#cbd5e1; }
-.tree-content{ padding:3px 4px; background:#fff; }
+.tree-content{ padding:3px 4px; background:rgba(255,255,255,.55); }
 .tree-item{
     padding:4px 6px;
     font-size:11px;
@@ -422,6 +424,7 @@ details.tree-group.exercise-cat-drop.drag-over > .tree-summary{
     height:calc(100vh - 58px);
     overflow:hidden;
     padding:10px;
+    background:transparent;
 }
 .exercise-toolbar{
     display:flex;
@@ -435,10 +438,11 @@ details.tree-group.exercise-cat-drop.drag-over > .tree-summary{
     border:1px solid #cfd5db;
     border-radius:7px;
     font-weight:bold;
+    background:rgba(255,255,255,.9);
 }
 .exercise-toolbar select{
     border:1px solid #cfd5db;
-    background:#fff;
+    background:rgba(255,255,255,.9);
     border-radius:7px;
     padding:8px 10px;
 }
@@ -446,8 +450,10 @@ details.tree-group.exercise-cat-drop.drag-over > .tree-summary{
     flex:1;
     min-height:0;
     overflow:auto;
-    background:#fff;
-    border:1px solid #d0d6dc;
+    background:rgba(255,255,255,.38);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    border:1px solid rgba(208,214,220,.7);
     border-radius:9px;
     padding:9px;
     display:grid;
@@ -572,15 +578,16 @@ details.tree-group.exercise-cat-drop.drag-over > .tree-summary{
     color:#287fe8;
 }
 
-/* TERRAIN SVG ET PIONS */
+/* TERRAIN SVG ET PIONS — fond opaque (pas de décor ici) */
 .court-container{
     position:relative;
     flex:1;
     min-height:0;
-    background:#fafafa;
+    background:#e8c48a;
     border:1px solid #d6dce2;
     border-radius:8px;
     overflow:hidden;
+    isolation:isolate;
 }
 .court-title{
     position:absolute;
@@ -813,8 +820,10 @@ details.tree-group.exercise-cat-drop.drag-over > .tree-summary{
 .palette{
     margin-top:8px;
     padding:6px 10px;
-    background:#f8fafc;
-    border:1px solid #d5dbe1;
+    background:rgba(248,250,252,.88);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    border:1px solid rgba(213,219,225,.85);
     border-radius:8px;
     display:flex; gap:8px; align-items:center; flex-wrap:wrap;
 }
@@ -873,17 +882,24 @@ details.tree-group.exercise-cat-drop.drag-over > .tree-summary{
 /* PANNEAU DE DROITE */
 .right-panel{ display:flex; flex-direction:column; gap:8px; }
 .panel-tools{
-    border:1px solid #d7dce2; border-radius:8px;
+    border:1px solid rgba(215,220,226,.85); border-radius:8px;
     padding:6px; display:flex; gap:5px;
+    background:rgba(255,255,255,.75);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
 }
 .panel-tools button{
     flex:1; padding:7px;
     border:1px solid #d2d8df; border-radius:6px;
-    background:#fff; font-size:11px;
+    background:rgba(255,255,255,.95); font-size:11px;
 }
 .info-field{ display:flex; flex-direction:column; flex:1; }
-.info-field label{ font-size:11px; font-weight:bold; text-transform:uppercase; margin-bottom:3px; color:#475569; }
-.info-field textarea{ flex:1; width:100%; min-height:65px; resize:none; border:1px solid #d2d8df; border-radius:7px; padding:8px; }
+.info-field label{ font-size:11px; font-weight:bold; text-transform:uppercase; margin-bottom:3px; color:#334155; text-shadow:0 1px 0 rgba(255,255,255,.5); }
+.info-field textarea{
+    flex:1; width:100%; min-height:65px; resize:none;
+    border:1px solid rgba(210,216,223,.9); border-radius:7px; padding:8px;
+    background:rgba(255,255,255,.9);
+}
 /* MODALE SÉANCE */
 .modal{
     position:fixed; inset:0; z-index:300;
