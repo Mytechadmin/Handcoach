@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HandCoach V12.1</title>
+<title>HandCoach V12</title>
 <style>
 *{box-sizing:border-box}
 html,body{
@@ -12,8 +12,34 @@ html,body{
     width:100%;
     height:100%;
     font-family:Arial, Helvetica, sans-serif;
-    background:#edf0f4;
     color:#20252b;
+}
+/*
+   Décor par défaut : montagnes boisées dans la brume (fondu).
+   SVG inline (data-URI) + voiles de brume en CSS — aucun fichier externe.
+*/
+body{
+    background-color:#c8d5df;
+    background-image:
+        /* Voile de brume global (lisibilité de l'UI) */
+        linear-gradient(180deg,
+            rgba(236,242,246,.88) 0%,
+            rgba(210,222,230,.55) 22%,
+            rgba(190,205,200,.28) 55%,
+            rgba(170,190,175,.18) 100%),
+        /* Silhouettes montagne + forêt */
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900' preserveAspectRatio='xMidYMax slice'%3E%3Cdefs%3E%3ClinearGradient id='sky' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%23dce8ef'/%3E%3Cstop offset='45%25' stop-color='%23c5d4de'/%3E%3Cstop offset='100%25' stop-color='%23a8bdb0'/%3E%3C/linearGradient%3E%3ClinearGradient id='mist' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%23e8eef3' stop-opacity='0'/%3E%3Cstop offset='40%25' stop-color='%23d5e0e8' stop-opacity='.35'/%3E%3Cstop offset='100%25' stop-color='%23c8d5df' stop-opacity='.55'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1600' height='900' fill='url(%23sky)'/%3E%3C!-- Crêtes lointaines bleutées --%3E%3Cpath d='M0 620 L180 480 L320 560 L480 400 L620 520 L780 360 L960 500 L1120 390 L1280 510 L1450 420 L1600 500 L1600 900 L0 900 Z' fill='%237a92a8' opacity='.45'/%3E%3Cpath d='M0 650 L200 520 L360 600 L520 460 L700 580 L880 440 L1050 560 L1220 470 L1400 550 L1600 480 L1600 900 L0 900 Z' fill='%236b869c' opacity='.4'/%3E%3C!-- Massif boisé moyen --%3E%3Cpath d='M0 700 L150 580 L280 640 L420 540 L560 620 L720 500 L900 600 L1080 520 L1250 610 L1420 540 L1600 600 L1600 900 L0 900 Z' fill='%234a6b58' opacity='.5'/%3E%3C!-- Pins stylisés (bande moyenne) --%3E%3Cg fill='%233a5646' opacity='.55'%3E%3Cpath d='M80 720 L100 640 L120 720 Z'/%3E%3Cpath d='M140 730 L165 630 L190 730 Z'/%3E%3Cpath d='M220 725 L240 650 L260 725 Z'/%3E%3Cpath d='M400 710 L430 600 L460 710 Z'/%3E%3Cpath d='M500 720 L520 640 L540 720 Z'/%3E%3Cpath d='M680 705 L710 590 L740 705 Z'/%3E%3Cpath d='M800 715 L825 620 L850 715 Z'/%3E%3Cpath d='M980 710 L1010 595 L1040 710 Z'/%3E%3Cpath d='M1150 720 L1175 640 L1200 720 Z'/%3E%3Cpath d='M1320 708 L1355 585 L1390 708 Z'/%3E%3Cpath d='M1480 718 L1505 635 L1530 718 Z'/%3E%3C/g%3E%3C!-- Premier plan forêt sombre --%3E%3Cpath d='M0 780 L120 700 L240 760 L380 680 L520 750 L680 670 L840 740 L1000 690 L1180 760 L1340 700 L1500 750 L1600 720 L1600 900 L0 900 Z' fill='%23283d32' opacity='.55'/%3E%3Cpath d='M0 820 L180 760 L340 810 L500 740 L700 800 L900 750 L1100 810 L1300 760 L1500 800 L1600 770 L1600 900 L0 900 Z' fill='%231f3228' opacity='.6'/%3E%3C!-- Pins premier plan --%3E%3Cg fill='%231a2b22' opacity='.7'%3E%3Cpath d='M40 850 L70 740 L100 850 Z'/%3E%3Cpath d='M160 860 L200 720 L240 860 Z'/%3E%3Cpath d='M300 845 L330 750 L360 845 Z'/%3E%3Cpath d='M600 850 L650 710 L700 850 Z'/%3E%3Cpath d='M900 855 L940 725 L980 855 Z'/%3E%3Cpath d='M1200 848 L1240 730 L1280 848 Z'/%3E%3Cpath d='M1450 860 L1490 740 L1530 860 Z'/%3E%3C/g%3E%3C!-- Brume basse --%3E%3Crect width='1600' height='900' fill='url(%23mist)'/%3E%3C!-- Voile haut pour fondre vers l'UI --%3E%3Crect width='1600' height='420' fill='%23e8eef3' opacity='.35'/%3E%3C/svg%3E");
+    background-attachment:fixed;
+    background-size:cover;
+    background-position:center bottom;
+    background-repeat:no-repeat;
+}
+/* Quand l'utilisateur impose son image dans les réglages */
+body.handcoach-custom-background{
+    background-size:cover !important;
+    background-position:center center !important;
+    background-repeat:no-repeat !important;
+    background-attachment:fixed !important;
 }
 button, input, textarea, select{font:inherit}
 button{cursor:pointer}
@@ -1140,7 +1166,7 @@ details.tree-group.exercise-cat-drop.drag-over > .tree-summary{
 <body>
 
 <header class="header">
-    <h1>🤾 HandCoach V12.1</h1>
+    <h1>🤾 HandCoach V12</h1>
 
     <div class="spacer"></div>
 
@@ -1451,7 +1477,7 @@ details.tree-group.exercise-cat-drop.drag-over > .tree-summary{
 
 <script>
 /* =========================================================
-   HANDCOACH V11.4 — GUIDE RAPIDE
+   HANDCOACH V12 — GUIDE RAPIDE
 
    1. CONFIGURATION / STOCKAGE
    2. SAUVEGARDE DANS LE DOSSIER "Hand"
@@ -1474,7 +1500,7 @@ details.tree-group.exercise-cat-drop.drag-over > .tree-summary{
    1. CONFIGURATION / STOCKAGE
 ========================================================= */
 
-const APP_VERSION = "V12.1";
+const APP_VERSION = "V12";
 
 const EXERCISES_KEY = "handcoach_v10.3_exercises";
 const SESSIONS_KEY = "handcoach_v10.3_sessions";
