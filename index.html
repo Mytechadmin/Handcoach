@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HandCoach V11.9</title>
+<title>HandCoach V12</title>
 <style>
 *{box-sizing:border-box}
 html,body{
@@ -111,19 +111,83 @@ details.sidebar-section > summary.sidebar-section-title{
     align-items:center;
     justify-content:space-between;
     user-select:none;
+    gap:8px;
 }
 details.sidebar-section > summary.sidebar-section-title::-webkit-details-marker{ display:none; }
+details.sidebar-section > summary.sidebar-section-title .section-icon{
+    font-size:16px;
+    display:inline-block;
+    line-height:1;
+}
+details.sidebar-section[open] > summary.sidebar-section-title .section-icon{
+    animation:sectionIconPop .45s ease;
+}
+@keyframes sectionIconPop{
+    0%{ transform:scale(1) rotate(0deg); }
+    35%{ transform:scale(1.35) rotate(-12deg); }
+    65%{ transform:scale(1.15) rotate(8deg); }
+    100%{ transform:scale(1) rotate(0deg); }
+}
 details.sidebar-section > summary.sidebar-section-title::after{
     content:"▾";
     font-size:12px;
     color:#64748b;
     transition:transform .15s ease;
+    margin-left:auto;
 }
 details.sidebar-section:not([open]) > summary.sidebar-section-title::after{
     transform:rotate(-90deg);
 }
 details.sidebar-section:not([open]) > summary.sidebar-section-title{
     border-bottom:none;
+}
+.catalog-list{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    margin-top:8px;
+}
+.catalog-row{
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+.catalog-row input{
+    flex:1;
+    padding:7px 8px;
+    border:1px solid #cfd5db;
+    border-radius:6px;
+    font-size:13px;
+}
+.catalog-row button{
+    border:0;
+    border-radius:6px;
+    padding:7px 10px;
+    cursor:pointer;
+    font-size:12px;
+    font-weight:bold;
+}
+.catalog-row .cat-save{ background:#287fe8; color:#fff; }
+.catalog-row .cat-del{ background:#fee2e2; color:#b91c1c; }
+.catalog-add-row{
+    display:flex;
+    gap:6px;
+    margin-top:8px;
+}
+.catalog-add-row input{
+    flex:1;
+    padding:8px;
+    border:1px solid #cfd5db;
+    border-radius:6px;
+}
+.catalog-add-row button{
+    border:0;
+    border-radius:6px;
+    padding:8px 12px;
+    background:#287fe8;
+    color:#fff;
+    font-weight:bold;
+    cursor:pointer;
 }
 .sidebar-section-body{
     padding:6px;
@@ -1017,7 +1081,7 @@ details.tree-group.exercise-cat-drop.drag-over > .tree-summary{
 <body>
 
 <header class="header">
-    <h1>🤾 HandCoach V11.9</h1>
+    <h1>🤾 HandCoach V12</h1>
 
     <div class="spacer"></div>
 
@@ -1042,9 +1106,9 @@ details.tree-group.exercise-cat-drop.drag-over > .tree-summary{
 
     <div class="header-actions">
     <button class="icon-button" id="addCourtButton" title="Ajouter un second terrain" aria-label="Ajouter un second terrain">＋</button>
-    <button class="icon-button" id="newExercise" title="Fiche vierge" aria-label="Fiche vierge">📄</button>
+    <button class="icon-button" id="newExercise" title="Fiche vierge" aria-label="Fiche vierge">🎯</button>
     <button class="icon-button" id="saveExercise" title="Sauvegarder l'exercice" aria-label="Sauvegarder l'exercice">💾</button>
-    <button class="icon-button" id="sessionButton" title="Nouvelle séance" aria-label="Nouvelle séance">📋</button>
+    <button class="icon-button" id="sessionButton" title="Nouvelle séance" aria-label="Nouvelle séance">📅</button>
     <button class="icon-button" id="printButton" title="Imprimer l'exercice" aria-label="Imprimer l'exercice">🖨️</button>
     <button class="icon-button" id="settingsButton" title="Personnaliser HandCoach" aria-label="Personnaliser HandCoach">🔧</button>
     
@@ -1054,13 +1118,19 @@ details.tree-group.exercise-cat-drop.drag-over > .tree-summary{
 <div class="app">
     <aside class="sidebar">
         <details class="sidebar-section" id="exercisesSection">
-            <summary class="sidebar-section-title">Exercices</summary>
+            <summary class="sidebar-section-title">
+                <span class="section-icon" aria-hidden="true">🎯</span>
+                <span>Exercices</span>
+            </summary>
             <div class="sidebar-section-body">
                 <div id="exercisesTree"></div>
             </div>
         </details>
         <details class="sidebar-section" id="sessionsSection">
-            <summary class="sidebar-section-title">Séances</summary>
+            <summary class="sidebar-section-title">
+                <span class="section-icon" aria-hidden="true">📅</span>
+                <span>Séances</span>
+            </summary>
             <div class="sidebar-section-body">
                 <div id="sessionsTree"></div>
             </div>
@@ -1207,13 +1277,12 @@ details.tree-group.exercise-cat-drop.drag-over > .tree-summary{
 <!-- MODALE SÉANCE -->
 <div id="sessionModal" class="modal">
     <div class="modal-box">
-        <h2>Créer une Séance</h2>
-        <div style="display:flex; gap:8px; margin-bottom:12px;">
-            <input id="sessionName" placeholder="Nom de la séance (ex: Séance Reprise)" style="flex:1; padding:8px; border:1px solid #ccc; border-radius:5px;">
-            <input id="sessionCategory" placeholder="Thème (optionnel → À classer)" style="width:180px; padding:8px; border:1px solid #ccc; border-radius:5px;">
+        <h2>📅 Créer une Séance</h2>
+        <div style="margin-bottom:12px;">
+            <input id="sessionName" placeholder="Nom de la séance (ex: Séance Reprise)" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:5px; box-sizing:border-box;">
         </div>
         <div style="margin:14px 0; padding:10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; font-size:12px; color:#475569;">
-            La séance sera créée vide. Tu pourras ensuite ajouter les exercices un par un par <strong>glisser-déposer</strong> depuis la bibliothèque.
+            La séance sera créée dans la <strong>bulle « À placer »</strong>. Glisse-la ensuite vers un thème existant, puis ajoute les exercices par glisser-déposer.
         </div>
         <div style="margin-top:15px; display:flex; gap:8px;">
             <button id="saveSessionBtn" style="background:#287fe8; color:white; border:none; padding:9px 15px; border-radius:5px; font-weight:bold;">Enregistrer la séance</button>
@@ -1294,6 +1363,26 @@ details.tree-group.exercise-cat-drop.drag-over > .tree-summary{
                     <span></span>
                 </div>
             </div>
+
+            <div class="settings-card">
+                <h3>🎯 Catégories d'exercices</h3>
+                <p>Ajoute, renomme ou supprime les catégories utilisées dans le menu Exercices.</p>
+                <div id="exerciseCategoriesList" class="catalog-list"></div>
+                <div class="catalog-add-row">
+                    <input id="newExerciseCategoryInput" type="text" placeholder="Nouvelle catégorie…">
+                    <button type="button" id="addExerciseCategoryBtn">Ajouter</button>
+                </div>
+            </div>
+
+            <div class="settings-card">
+                <h3>📅 Thèmes de séances</h3>
+                <p>Gère les thèmes dans lesquels tu classes tes séances (glisser-déposer depuis la bulle).</p>
+                <div id="sessionThemesList" class="catalog-list"></div>
+                <div class="catalog-add-row">
+                    <input id="newSessionThemeInput" type="text" placeholder="Nouveau thème…">
+                    <button type="button" id="addSessionThemeBtn">Ajouter</button>
+                </div>
+            </div>
             </div>
         </div>
 
@@ -1326,10 +1415,176 @@ details.tree-group.exercise-cat-drop.drag-over > .tree-summary{
    1. CONFIGURATION / STOCKAGE
 ========================================================= */
 
-const APP_VERSION = "11.9";
+const APP_VERSION = "V12";
 
 const EXERCISES_KEY = "handcoach_v10.3_exercises";
 const SESSIONS_KEY = "handcoach_v10.3_sessions";
+const EXERCISE_CATEGORIES_KEY = "handcoach_exercise_categories";
+const SESSION_THEMES_KEY = "handcoach_session_themes";
+
+const DEFAULT_EXERCISE_CATEGORIES = [
+    "Attaque", "Défense", "Échauffement", "Montée de balle",
+    "Jeu à thème", "Gardien", "Physique"
+];
+const DEFAULT_SESSION_THEMES = ["Général", "Reprise", "Préparation"];
+
+function loadStringArray(key, fallback){
+    try{
+        const data = JSON.parse(localStorage.getItem(key) || "null");
+        if(Array.isArray(data) && data.length){
+            return data.map(s => String(s).trim()).filter(Boolean);
+        }
+    }catch(e){}
+    return fallback.slice();
+}
+
+function saveStringArray(key, arr){
+    localStorage.setItem(key, JSON.stringify(arr));
+}
+
+let exerciseCategories = loadStringArray(EXERCISE_CATEGORIES_KEY, DEFAULT_EXERCISE_CATEGORIES);
+let sessionThemes = loadStringArray(SESSION_THEMES_KEY, DEFAULT_SESSION_THEMES);
+
+function getExerciseCategories(){
+    return exerciseCategories.slice();
+}
+
+function getSessionThemes(){
+    /* Fusionne les thèmes enregistrés + ceux déjà utilisés dans les séances */
+    const used = sessions
+        .map(s => s.category || "")
+        .filter(c => c && c !== "À classer");
+    return [...new Set([...sessionThemes, ...used])];
+}
+
+function refreshExerciseCategorySelect(){
+    const select = $("exerciseCategory");
+    if(!select) return;
+    const current = select.value;
+    select.innerHTML = "";
+    const optPending = document.createElement("option");
+    optPending.value = "À classer";
+    optPending.textContent = "À classer";
+    select.appendChild(optPending);
+    getExerciseCategories().forEach(cat => {
+        const opt = document.createElement("option");
+        opt.value = cat;
+        opt.textContent = cat;
+        select.appendChild(opt);
+    });
+    if([...select.options].some(o => o.value === current)){
+        select.value = current;
+    }else{
+        select.value = "À classer";
+    }
+}
+
+function renderCatalogEditor(containerId, items, onRename, onDelete){
+    const box = $(containerId);
+    if(!box) return;
+    box.innerHTML = "";
+    items.forEach((name, index) => {
+        const row = document.createElement("div");
+        row.className = "catalog-row";
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = name;
+        const saveBtn = document.createElement("button");
+        saveBtn.type = "button";
+        saveBtn.className = "cat-save";
+        saveBtn.textContent = "OK";
+        saveBtn.title = "Enregistrer le nom";
+        saveBtn.onclick = () => onRename(index, input.value.trim());
+        const delBtn = document.createElement("button");
+        delBtn.type = "button";
+        delBtn.className = "cat-del";
+        delBtn.textContent = "✕";
+        delBtn.title = "Supprimer";
+        delBtn.onclick = () => onDelete(index, name);
+        row.appendChild(input);
+        row.appendChild(saveBtn);
+        row.appendChild(delBtn);
+        box.appendChild(row);
+    });
+}
+
+function refreshCatalogSettingsUI(){
+    renderCatalogEditor(
+        "exerciseCategoriesList",
+        exerciseCategories,
+        (index, newName) => {
+            if(!newName){
+                showToast("⚠️ Nom vide");
+                return;
+            }
+            if(exerciseCategories.some((c, i) => i !== index && c === newName)){
+                showToast("⚠️ Cette catégorie existe déjà");
+                return;
+            }
+            const oldName = exerciseCategories[index];
+            exerciseCategories[index] = newName;
+            saveStringArray(EXERCISE_CATEGORIES_KEY, exerciseCategories);
+            /* Renomme les exercices concernés */
+            exercises.forEach(ex => {
+                if(ex.category === oldName) ex.category = newName;
+            });
+            if($("exerciseCategory") && $("exerciseCategory").value === oldName){
+                $("exerciseCategory").value = newName;
+            }
+            saveStorage();
+            refreshExerciseCategorySelect();
+            refreshCatalogSettingsUI();
+            showToast("✅ Catégorie renommée");
+        },
+        (index, name) => {
+            if(!confirm(`Supprimer la catégorie « ${name} » ?\nLes exercices seront placés en « À classer ».`)) return;
+            exerciseCategories.splice(index, 1);
+            saveStringArray(EXERCISE_CATEGORIES_KEY, exerciseCategories);
+            exercises.forEach(ex => {
+                if(ex.category === name) ex.category = "À classer";
+            });
+            saveStorage();
+            refreshExerciseCategorySelect();
+            refreshCatalogSettingsUI();
+            showToast("🗑️ Catégorie supprimée");
+        }
+    );
+
+    renderCatalogEditor(
+        "sessionThemesList",
+        sessionThemes,
+        (index, newName) => {
+            if(!newName){
+                showToast("⚠️ Nom vide");
+                return;
+            }
+            if(sessionThemes.some((c, i) => i !== index && c === newName)){
+                showToast("⚠️ Ce thème existe déjà");
+                return;
+            }
+            const oldName = sessionThemes[index];
+            sessionThemes[index] = newName;
+            saveStringArray(SESSION_THEMES_KEY, sessionThemes);
+            sessions.forEach(se => {
+                if(se.category === oldName) se.category = newName;
+            });
+            saveStorage();
+            refreshCatalogSettingsUI();
+            showToast("✅ Thème renommé");
+        },
+        (index, name) => {
+            if(!confirm(`Supprimer le thème « ${name} » ?\nLes séances seront placées en « À classer ».`)) return;
+            sessionThemes.splice(index, 1);
+            saveStringArray(SESSION_THEMES_KEY, sessionThemes);
+            sessions.forEach(se => {
+                if(se.category === name) se.category = "À classer";
+            });
+            saveStorage();
+            refreshCatalogSettingsUI();
+            showToast("🗑️ Thème supprimé");
+        }
+    );
+}
 
 /* Anciennes clés : elles permettent de récupérer ton travail. */
 const OLD_EXERCISES_KEYS = [
@@ -2624,7 +2879,6 @@ $("addCourtButton").onclick = addSecondCourt;
 
 $("sessionButton").onclick = () => {
     $("sessionName").value = "";
-    $("sessionCategory").value = "";
     $("sessionModal").classList.add("visible");
 };
 
@@ -2634,15 +2888,12 @@ $("closeSessionBtn").onclick = () => {
 
 $("saveSessionBtn").onclick = async () => {
     const name = $("sessionName").value.trim() || "Nouvelle Séance";
-    /* Sans thème saisi → zone « À classer » en bas de la barre latérale */
-    const rawCategory = $("sessionCategory").value.trim();
-    const category = rawCategory || "À classer";
 
     const newId = uid();
     sessions.push({
         id: newId,
         name,
-        category,
+        category: "À classer",
         date: new Date().toLocaleDateString("fr-FR"),
         items: []
     });
@@ -2652,9 +2903,7 @@ $("saveSessionBtn").onclick = async () => {
     saveStorage();
 
     $("sessionModal").classList.remove("visible");
-    showToast(category === "À classer"
-        ? "📋 Nouvelle séance dans la bulle — glisse-la vers un thème"
-        : "📋 Séance créée — ouvre Séances pour y glisser des exercices");
+    showToast("📅 Nouvelle séance dans la bulle — glisse-la vers un thème");
 };
 
 /* =========================================================
@@ -2825,10 +3074,7 @@ function renderSidebar(){
     const exerciseContainer = $("exercisesTree");
     exerciseContainer.innerHTML = "";
 
-    const categories = [
-        "Attaque", "Défense", "Échauffement", "Montée de balle",
-        "Jeu à thème", "Gardien", "Physique"
-    ];
+    const categories = getExerciseCategories();
 
     categories.forEach(category => {
         const categoryExercises = exercises.filter(ex => ex.category === category);
@@ -2892,7 +3138,7 @@ function renderSidebar(){
             item.draggable = true;
 
             item.innerHTML = `
-                <span>📄 ${exercise.title || "Sans titre"}
+                <span>🎯 ${exercise.title || "Sans titre"}
                     <small>(${exercise.duration || 15}m)</small>
                 </span>
             `;
@@ -2973,10 +3219,7 @@ function renderPendingDock(){
     const list = $("pendingDockList");
     if(!dock || !list) return;
 
-    const knownCategories = [
-        "Attaque", "Défense", "Échauffement", "Montée de balle",
-        "Jeu à thème", "Gardien", "Physique"
-    ];
+    const knownCategories = getExerciseCategories();
 
     const pendingExercises = exercises.filter(ex =>
         !ex.category || ex.category === "À classer" || !knownCategories.includes(ex.category)
@@ -2999,7 +3242,7 @@ function renderPendingDock(){
         item.className = "tree-item" + (exercise.id === currentId ? " active" : "");
         item.draggable = true;
         item.innerHTML = `
-            <span>📄 ${exercise.title || "Sans titre"}
+            <span>🎯 ${exercise.title || "Sans titre"}
                 <small>(${exercise.duration || 15}m)</small>
             </span>
         `;
@@ -3044,7 +3287,7 @@ function renderPendingDock(){
             (total, item) => total + (parseInt(item.duration) || 0), 0
         );
         row.innerHTML = `
-            <span>📋 ${session.name}
+            <span>📅 ${session.name}
                 <small>(${totalDuration}m)</small>
             </span>
         `;
@@ -3120,11 +3363,7 @@ function renderPendingDock(){
         }
     }
 
-    const sessionCategories = [...new Set(
-        sessions
-            .map(session => session.category || "Général")
-            .filter(cat => cat !== "À classer")
-    )];
+    const sessionCategories = getSessionThemes().filter(cat => cat !== "À classer");
 
     sessionCategories.forEach(category => {
         const categorySessions = sessions.filter(
@@ -3246,7 +3485,7 @@ sessionSummary.addEventListener("dragend", () => {
             );
 
            sessionSummary.innerHTML = `
-    <span>📋 ${session.name}
+    <span>📅 ${session.name}
         <small style="color:#64748b; font-weight:normal;">(${totalDuration}m)</small>
     </span>
     <span class="tree-actions">
@@ -3424,7 +3663,7 @@ if (session.team_id) {
                 subItem.classList.add("session-sortable-row");
 
                 subItem.innerHTML = `
-                    <span>↕ &nbsp;📄 ${exercise.title}
+                    <span>↕ &nbsp;🎯 ${exercise.title}
                         <small>(${item.duration} min)</small>
                     </span>
                     <button class="session-remove-btn" title="Retirer cet exercice de la séance">✕</button>
@@ -4652,13 +4891,11 @@ color_cone: '#ffd21b'
       const modal = $("settingsModal");
       if(!modal) return;
 
-      if(!currentUser){
-          showToast("🔐 Connecte-toi pour utiliser la personnalisation");
-          return;
-      }
-
       applyUserSettings();
-      setSettingsStatus("");
+      refreshCatalogSettingsUI();
+      setSettingsStatus(currentUser
+          ? ""
+          : "💡 Connecte-toi pour le fond, le logo et les couleurs cloud. Les catégories/thèmes fonctionnent hors ligne.");
       modal.classList.add("visible");
   }
 
@@ -4673,6 +4910,45 @@ color_cone: '#ffd21b'
 
       $("settingsModal")?.addEventListener("click", event => {
           if(event.target === $("settingsModal")) closeSettingsModal();
+      });
+
+      $("addExerciseCategoryBtn")?.addEventListener("click", () => {
+          const input = $("newExerciseCategoryInput");
+          const name = (input?.value || "").trim();
+          if(!name){
+              showToast("⚠️ Indique un nom de catégorie");
+              return;
+          }
+          if(exerciseCategories.includes(name) || name === "À classer"){
+              showToast("⚠️ Cette catégorie existe déjà");
+              return;
+          }
+          exerciseCategories.push(name);
+          saveStringArray(EXERCISE_CATEGORIES_KEY, exerciseCategories);
+          if(input) input.value = "";
+          refreshExerciseCategorySelect();
+          refreshCatalogSettingsUI();
+          renderSidebar();
+          showToast("✅ Catégorie ajoutée");
+      });
+
+      $("addSessionThemeBtn")?.addEventListener("click", () => {
+          const input = $("newSessionThemeInput");
+          const name = (input?.value || "").trim();
+          if(!name){
+              showToast("⚠️ Indique un nom de thème");
+              return;
+          }
+          if(sessionThemes.includes(name) || name === "À classer"){
+              showToast("⚠️ Ce thème existe déjà");
+              return;
+          }
+          sessionThemes.push(name);
+          saveStringArray(SESSION_THEMES_KEY, sessionThemes);
+          if(input) input.value = "";
+          refreshCatalogSettingsUI();
+          renderSidebar();
+          showToast("✅ Thème ajouté");
       });
 
       $("backgroundFile")?.addEventListener("change", async event => {
@@ -5476,6 +5752,19 @@ async function createInviteCodeFromUI(teamId, permission) {
 
   setupSettingsUI();
   applyUserSettings();
+  refreshExerciseCategorySelect();
+
+  /* Anime l'icône à chaque ouverture / fermeture des menus latéraux */
+  document.querySelectorAll("details.sidebar-section > summary").forEach(summary => {
+      summary.addEventListener("click", () => {
+          const icon = summary.querySelector(".section-icon");
+          if(!icon) return;
+          icon.style.animation = "none";
+          // force reflow pour relancer l'animation
+          void icon.offsetWidth;
+          icon.style.animation = "";
+      });
+  });
 
 
 (function setupPaletteMoreMenu(){
