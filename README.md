@@ -53,10 +53,16 @@ HandCoach permet de concevoir des exercices sur un terrain de handball, de les c
 Les captures d'écran de l'application seront ajoutées ici afin de présenter les principaux écrans :
 
 - Éditeur d'exercices.
+  <img width="1904" height="953" alt="image" src="https://github.com/user-attachments/assets/6651ec03-b582-45cb-8d96-1867cb3e4ad6" />
+
 - Bibliothèque d'exercices.
+  <img width="234" height="851" alt="image" src="https://github.com/user-attachments/assets/48f0493e-566c-46ac-83ae-8809288a921a" />
+
 - Préparation d'une séance.
-- Aperçu avant impression.
+  <img width="896" height="461" alt="image" src="https://github.com/user-attachments/assets/0899f512-1c94-4efa-a7e7-6768c51f2309" />
+
 - Gestion des bibliothèques partagées.
+  <img width="418" height="353" alt="image" src="https://github.com/user-attachments/assets/7996d3ef-13f7-41aa-b5d1-c0947fa5fa3a" />
 
 ---
 
