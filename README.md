@@ -64,6 +64,31 @@ Les captures d'écran de l'application seront ajoutées ici afin de présenter l
 - Gestion des bibliothèques partagées.
   <img width="418" height="353" alt="image" src="https://github.com/user-attachments/assets/7996d3ef-13f7-41aa-b5d1-c0947fa5fa3a" />
 
+
+## Version mobile : HandCoach Mobile
+
+HandCoach dispose également d'une **version mobile dédiée**, conçue pour consulter les exercices et les séances directement depuis un smartphone ou une tablette pendant les entraînements.
+
+L'objectif est de proposer deux usages complémentaires :
+
+- **Version web :** préparer les exercices, dessiner les situations et construire les séances depuis un ordinateur.
+- **Version mobile :** retrouver et consulter ces contenus sur le terrain, avec une interface adaptée au tactile.
+
+La version mobile utilise le **même compte et les mêmes données Supabase** que la version web. Elle permet notamment de consulter les exercices, les consignes, les variantes, les objectifs et les séances, ainsi que le terrain et son évolution.
+
+Le mode mobile est volontairement orienté lecture seule : les outils de création et de modification sont masqués afin de limiter les manipulations involontaires pendant une séance. La création et l'édition restent disponibles depuis la version web.
+
+### Aperçu sur smartphone
+
+<p align="center">
+  <img width="250" alt="HandCoach Mobile - consultation d'un exercice" src="https://github.com/user-attachments/assets/51d0457c-a0e2-44f4-a0cb-5a13c0672591" />
+  <img width="250" alt="HandCoach Mobile - affichage du terrain" src="https://github.com/user-attachments/assets/5a52f914-c305-4618-9d56-6ec2c78167ae" />
+  <img width="250" alt="HandCoach Mobile - consultation sur smartphone" src="https://github.com/user-attachments/assets/1ee98238-5a33-48e3-b7d8-de98548c8a7a" />
+</p>
+
+Retrouver le code et la présentation de cette déclinaison : **[Dépôt HandCoach Mobile](https://github.com/Mytechadmin/handball-mobile)**.
+
+
 ---
 
 ## Architecture et technologies
@@ -144,7 +169,7 @@ L'ouverture locale du fichier permet de tester l'interface, mais les fonctions q
 
 ## Pistes d'amélioration
 
-- Ajouter des captures d'écran et une démonstration guidée.
+- Ajouter une démonstration guidée du parcours de préparation web puis de consultation mobile.
 - Modulariser le code en séparant HTML, CSS et JavaScript.
 - Renforcer et documenter les tests fonctionnels.
 - Vérifier et documenter les politiques RLS et les permissions des fonctions RPC.
